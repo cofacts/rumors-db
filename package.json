@@ -1,0 +1,20 @@
+{
+  "name": "rumors-db",
+  "version": "1.0.0",
+  "description": "Rumors DB scripts",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "airtable": "babel-node airtable/airtableToElasticSearch.js"
+  },
+  "dependencies": {
+    "airtable": "^0.4.3",
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015-node6": "^0.4.0",
+    "babel-preset-es2017": "^6.16.0",
+    "babel-preset-stage-3": "^6.17.0",
+    "config": "^1.24.0",
+    "elasticsearch": "^12.1.0",
+    "node-fetch": "^1.6.3"
+  }
+}
