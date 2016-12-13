@@ -5,7 +5,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "airtable": "babel-node airtable/airtableToElasticSearch.js"
+    "airtable": "babel-node airtable/airtableToElasticSearch.js",
+    "schema": "babel-node db/loadSchema.js",
+    "clear": "babel-node db/clear.js",
+    "seed": "npm run clear && npm run schema && npm run airtable"
   },
   "dependencies": {
     "airtable": "^0.4.3",

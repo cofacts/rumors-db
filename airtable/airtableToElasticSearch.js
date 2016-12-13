@@ -2,7 +2,6 @@ import '../util/catchUnhandledRejection';
 import config from 'config';
 
 import Airtable from 'airtable';
-import fetch from 'node-fetch';
 import elasticsearch from 'elasticsearch'
 
 const client = new elasticsearch.Client({
