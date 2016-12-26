@@ -21,7 +21,7 @@ Deletes all indices.
 
 Creates indices with specified mappings.
 
-### `npm run csv`
+### `npm run csv -- <CSV_FILEPATH>`
 
 Reads seed data from csv file, analyze the duplicated rumors & answers, then write to DB.
 

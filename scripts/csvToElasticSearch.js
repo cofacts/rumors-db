@@ -3,17 +3,12 @@ import elasticsearch from 'elasticsearch';
 import parse from 'csv-parse/lib/sync';
 import {readFileSync} from 'fs';
 
-if(process.argv.length !== 2) {
-  console.log("Usage: babel-node scripts/csvToElasticSearch.js <PATH_TO_CSV_FILE>");
-  return 1;
-}
-
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
   log: 'trace',
 });
 
-const records = parse(readFileSync(process.argv[1], 'utf-8'), {columns: true})
+const records = parse(readFileSync('./data/20161226-0900.csv', 'utf-8'), {columns: true})
 const {rumors, answers} = aggregateRows(records);
 
 writeToElasticSearch('rumors', rumors);
