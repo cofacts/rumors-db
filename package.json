@@ -6,9 +6,10 @@
   "license": "MIT",
   "scripts": {
     "airtable": "babel-node airtable/airtableToElasticSearch.js",
+    "csv": "babel-node airtable/csvToElasticSearch.js",
     "schema": "babel-node db/loadSchema.js",
     "clear": "babel-node db/clear.js",
-    "seed": "npm run clear && npm run schema && npm run airtable"
+    "seed": "npm run clear && npm run schema && npm run csv"
   },
   "dependencies": {
     "airtable": "^0.4.3",
@@ -17,7 +18,9 @@
     "babel-preset-es2017": "^6.16.0",
     "babel-preset-stage-3": "^6.17.0",
     "config": "^1.24.0",
+    "csv": "^1.1.0",
     "elasticsearch": "^12.1.0",
-    "node-fetch": "^1.6.3"
+    "node-fetch": "^1.6.3",
+    "string-similarity": "^1.1.0"
   }
 }
