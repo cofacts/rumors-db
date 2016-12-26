@@ -1,7 +1,11 @@
 import config from 'config';
 import elasticsearch from 'elasticsearch';
 import parse from 'csv-parse/lib/sync';
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
+import { compareTwoStrings } from 'string-similarity';
+import ProgressBar from 'progress';
+
+const MIN_SIMILARITY = 0.87; // can't be higher
 
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
@@ -9,43 +13,62 @@ const client = new elasticsearch.Client({
 });
 
 const records = parse(readFileSync('./data/20161226-0900.csv', 'utf-8'), {columns: true})
-const {rumors, answers} = aggregateRows(records);
+const {rumors, answers} = aggregateRowsToDocs(records);
 
 writeToElasticSearch('rumors', rumors);
 writeToElasticSearch('answers', answers);
 
-function aggregateRows(rows) {
-  const data = {
-    rumors: [],
-    answers: [],
-  };
+function aggregateRowsToDocs(rows) {
+  const rumors = []; // rumors docs to return
+  const answers = []; // answer docs to return
+  const rumorTexts = []; // cached text array. Should be 1-1 mapping to rumors[].
+  const answerTexts = []; // cached text array. Should be 1-1 mapping to answers[].
+
+  const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length })
 
   records.forEach(function(record) {
-    const answer = record['Answer'];
-    const answerIds = []
+    let rumor;
+    const rumorText = record['Rumor Text'];
+    const rumorIdx = findDuplication(rumorTexts, rumorText);
 
-    if(answer) {
-      answerIds.push(`${record['Message ID']}-answer`);
+    if(rumorIdx !== -1) {
+      rumor = rumors[rumorIdx];
+    } else {
+      rumor = {
+        id: `${record['Message ID']}-rumor`,
+        text: rumorText,
+        answerIds: [],
+      };
+      rumors.push(rumor);
+      rumorTexts.push(rumorText);
     }
-
-    data.rumors.push({
-      id: `${record['Message ID']}-rumor`,
-      text: record['Rumor Text'],
-      answerIds,
-    });
 
     if(record['Answer']) {
-      data.answers.push({
-        id: answerIds[0],
-        versions: [{
-          text: record['Answer'],
-          reference: record['Reference'],
-        }],
-      });
+      const answerText = record['Answer'];
+      const answerIdx = findDuplication(answerTexts, answerText);
+      let answer;
+
+      if(answerIdx !== -1) {
+        answer = answers[answerIdx];
+      } else {
+        answer = {
+          id: `${record['Message ID']}-answer`,
+          versions: [{
+            text: record['Answer'],
+            reference: record['Reference'],
+          }],
+        };
+        answers.push(answer);
+        answerTexts.push(answerText);
+      }
+
+      rumor.answerIds.push(answer.id);
     }
+
+    bar.tick()
   });
 
-  return data;
+  return {rumors, answers};
 }
 
 function writeToElasticSearch(indexName, records){
@@ -61,4 +84,19 @@ function writeToElasticSearch(indexName, records){
   return client.bulk({
     body
   })
+}
+
+function findDuplication(texts, target) {
+  let idx = -1;
+  let bestSimilarity = MIN_SIMILARITY;
+
+  texts.forEach((text, i) => {
+    const similarity = compareTwoStrings(text, target);
+    if(similarity > bestSimilarity) {
+      idx = i;
+      bestSimilarity = similarity;
+    }
+  });
+
+  return idx;
 }
