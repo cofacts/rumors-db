@@ -50,5 +50,5 @@ On production environments, use:
 ```
 $ cd rumors-db
 $ docker run --rm -v `pwd`:/srv -w /srv kkarczmarczyk/node-yarn:6.9 yarn
-$ docker run --rm -v `pwd`:/srv -w /srv --network=rumorsdeploy_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' kkarczmarczyk/node-yarn:6.9 npm run seed # or other npm commands
+$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsdeploy_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' kkarczmarczyk/node-yarn:6.9 npm run seed # or other npm commands
 ```
