@@ -1,11 +1,15 @@
+import '../util/catchUnhandledRejection';
+
 import config from 'config';
 import elasticsearch from 'elasticsearch';
 import parse from 'csv-parse/lib/sync';
 import { readFileSync } from 'fs';
 import { compareTwoStrings } from 'string-similarity';
 import ProgressBar from 'progress';
+import readline from 'readline';
 
-const MIN_SIMILARITY = 0.87; // can't be higher
+const MIN_SIMILARITY = 0.4;
+const SAFE_SIMILARITY = 0.7;
 
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
@@ -13,12 +17,14 @@ const client = new elasticsearch.Client({
 });
 
 const records = parse(readFileSync('./data/20161226-0900.csv', 'utf-8'), {columns: true})
-const {rumors, answers} = aggregateRowsToDocs(records);
+aggregateRowsToDocs(records).then(({rumors, answers}) =>
+  Promise.all([
+    writeToElasticSearch('rumors', rumors),
+    writeToElasticSearch('answers', answers),
+  ])
+);
 
-writeToElasticSearch('rumors', rumors);
-writeToElasticSearch('answers', answers);
-
-function aggregateRowsToDocs(rows) {
+async function aggregateRowsToDocs(rows) {
   const rumors = []; // rumors docs to return
   const answers = []; // answer docs to return
   const rumorTexts = []; // cached text array. Should be 1-1 mapping to rumors[].
@@ -26,12 +32,17 @@ function aggregateRowsToDocs(rows) {
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length })
 
-  records.forEach(function(record) {
+  for(const record of rows) {
     let rumor;
     const rumorText = record['Rumor Text'];
-    const rumorIdx = findDuplication(rumorTexts, rumorText);
+    const {idx: rumorIdx, similarity: rumorSimilarity} = findDuplication(rumorTexts, rumorText);
 
-    if(rumorIdx !== -1) {
+    if(
+      rumorIdx !== -1 && (
+        rumorSimilarity > SAFE_SIMILARITY ||
+        console.log("\nSimilarity =", rumorSimilarity) || await askSimilarity(rumors[rumorIdx].text, rumorText)
+      )
+    ) {
       rumor = rumors[rumorIdx];
     } else {
       rumor = {
@@ -45,10 +56,13 @@ function aggregateRowsToDocs(rows) {
 
     if(record['Answer']) {
       const answerText = record['Answer'];
-      const answerIdx = findDuplication(answerTexts, answerText);
+      const {idx: answerIdx, similarity: answerSimilarity} = findDuplication(answerTexts, answerText);
       let answer;
 
-      if(answerIdx !== -1) {
+      if(answerIdx !== -1 && (
+        answerSimilarity > SAFE_SIMILARITY ||
+        console.log("\nSimilarity =", answerSimilarity) || await askSimilarity(answers[answerIdx].versions[0].text, answerText)
+      )) {
         answer = answers[answerIdx];
       } else {
         answer = {
@@ -65,8 +79,8 @@ function aggregateRowsToDocs(rows) {
       rumor.answerIds.push(answer.id);
     }
 
-    bar.tick()
-  });
+    bar.tick();
+  };
 
   return {rumors, answers};
 }
@@ -98,5 +112,24 @@ function findDuplication(texts, target) {
     }
   });
 
-  return idx;
+  return {idx, similarity: bestSimilarity};
+}
+
+function askSimilarity(doc1, doc2) {
+  return new Promise(function(resolve, reject) {
+    console.log('\n==============================');
+    console.log(doc1);
+    console.log('------------------------------');
+    console.log(doc2);
+    console.log('==============================\n');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    rl.question("Are these 2 documents the same? (Y/n)", ans => {
+      if(ans === 'n') resolve(false);
+      else resolve(true);
+      rl.close()
+    })
+  });
 }
