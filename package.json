@@ -11,7 +11,6 @@
     "seed": "npm run clear && npm run schema && npm run csv -- data/20161226-0900.csv"
   },
   "dependencies": {
-    "airtable": "^0.4.3",
     "babel-cli": "^6.18.0",
     "babel-preset-es2015-node6": "^0.4.0",
     "babel-preset-es2017": "^6.16.0",
