@@ -8,6 +8,11 @@ import { compareTwoStrings } from 'string-similarity';
 import ProgressBar from 'progress';
 import readline from 'readline';
 
+if(process.argv.length !== 3) {
+  console.log("Usage: babel-node scripts/csvToElasticSearch.js <PATH_TO_CSV_FILE>");
+  process.exit(1);
+}
+
 const MIN_SIMILARITY = 0.4;
 const SAFE_SIMILARITY = 0.7;
 
@@ -16,7 +21,7 @@ const client = new elasticsearch.Client({
   log: 'trace',
 });
 
-const records = parse(readFileSync('./data/20161226-0900.csv', 'utf-8'), {columns: true})
+const records = parse(readFileSync(process.argv[2], 'utf-8'), {columns: true})
 aggregateRowsToDocs(records).then(({rumors, answers}) =>
   Promise.all([
     writeToElasticSearch('rumors', rumors),
