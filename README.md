@@ -1,6 +1,8 @@
 Scripts for managing rumors db
 ==========
 
+If you do not have `npm` and `yarn` installed, please see [Run with docker](#run-with-docker) section below.
+
 Installation
 ---
 
