@@ -8,7 +8,8 @@
     "csv": "babel-node scripts/csvToElasticSearch.js",
     "schema": "babel-node db/loadSchema.js",
     "clear": "babel-node db/clear.js",
-    "seed": "npm run clear && npm run schema && npm run csv -- data/`ls -r data/ | head -n 1`"
+    "seed": "npm run clear && npm run schema && npm run csv -- data/`ls -r data/ | head -n 1`",
+    "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
     "babel-cli": "^6.18.0",

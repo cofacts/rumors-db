@@ -3,23 +3,53 @@ Scripts for managing rumors db
 
 If you do not have `npm` and `yarn` installed, please see [Run with docker](#run-with-docker) section below.
 
-Installation
----
+##Installation
 
 ```
-yarn
+$ yarn
+
+# If you have docker but don't have yarn, run:
+$ docker run --rm -v `pwd`:/srv -w /srv kkarczmarczyk/node-yarn:6.9 yarn
 ```
 
-Seeding data
+
+## Populate seed data for dev environments.
+
+Index mappings (schemas) are written in `schema/` directory. To seed the database for development, you should first start the development elastic search server using `docker-compose` as specified [rumors-api](https://github.com/MrOrz/rumors-api).
+
+Then run:
+
+```
+$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsapi_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' kkarczmarczyk/node-yarn:6.9 npm run seed
+```
+
+It connects to the database created clears all DB records and populates it with
+sample rumors & answers.
+
+## Prepare database for unit test
+
+To prepare test DB, first start an elastic search server on port 62223:
+
+```
+$ docker run -d -p "62223:9200" --name "rumors-test-db" elasticsearch
+```
+
+Then run this to reset the test database:
+
+```
+$ npm t
+
+# If you have docker but don't have npm, run:
+$ docker run --rm -it -v `pwd`:/srv -w /srv  -e 'NODE_ENV=test' kkarczmarczyk/node-yarn:6.9 npm t
+```
+
+It connects to the test database, deletes all its existing data and then applies the lastest mappings on the test database.
+
 ---
 
-Index mappings (schemas) are written in `schema/` directory.
+## Other commands
 
-### `npm run seed`
-
-Runs all the scripts below.
-
----
+These commands are invoked by commands mentioned above. See `package.json` for details.
 
 ### `npm run clear`
 
@@ -34,14 +64,12 @@ Creates indices with specified mappings.
 Reads seed data from csv file, analyze the duplicated rumors & answers, then write to DB.
 
 
-Run with docker
----
+## Run with docker
 
 On dev environments with docker but no node, use:
 
 ```
 $ cd rumors-db
-$ docker run --rm -v `pwd`:/srv -w /srv kkarczmarczyk/node-yarn:6.9 yarn
 $ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsapi_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' kkarczmarczyk/node-yarn:6.9 npm run seed # or other npm commands
 ```
 
