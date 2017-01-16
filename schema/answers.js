@@ -3,7 +3,7 @@ export default {
   properties: {
     versions: {
       properties: {
-        text: {type: 'text'},
+        text: {type: 'text', analyzer: 'cjk'},
         reference: {type: 'text'},
         createdAt: { type: 'date' },
       }
