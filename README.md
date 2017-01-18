@@ -59,9 +59,16 @@ Deletes all indices.
 
 Creates indices with specified mappings.
 
-### `npm run csv -- <CSV_FILEPATH>`
+### `npm run json -- <JSON_FILEPATH>`
 
-Reads seed data from csv file, analyze the duplicated rumors & answers, then write to DB.
+Reads seed data from json file and write to ElasticSearch. (defaut to `localhost:62222`)
+
+
+### `npm run csv`
+
+Used to create JSON seed files from CSV files exported from Airtable.
+
+Reads seed data from csv file, analyze the duplicated rumors & answers, then write to JSON. (Default to the same directory of CSV_FILEPATH, but with `.json` postfix)
 
 
 ## Run with docker

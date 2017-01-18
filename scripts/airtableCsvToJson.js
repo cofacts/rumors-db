@@ -1,33 +1,26 @@
 import '../util/catchUnhandledRejection';
-
-import config from 'config';
-import elasticsearch from 'elasticsearch';
-import parse from 'csv-parse/lib/sync';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { compareTwoStrings } from 'string-similarity';
+import parse from 'csv-parse/lib/sync';
 import ProgressBar from 'progress';
 import readline from 'readline';
 
+const inFile = process.argv[2];
+const outFile = inFile.replace(/.csv$/, '.json');
+
+const records = parse(readFileSync(inFile, 'utf-8'), {columns: true});
+
 if(process.argv.length !== 3) {
-  console.log("Usage: babel-node scripts/csvToElasticSearch.js <PATH_TO_CSV_FILE>");
+  console.log("Usage: babel-node scripts/airtableCsvToJson.js <PATH_TO_CSV_FILE>");
   process.exit(1);
 }
 
 const MIN_SIMILARITY = 0.4;
 const SAFE_SIMILARITY = 0.7;
 
-const client = new elasticsearch.Client({
-  host: config.get('ELASTICSEARCH_URL'),
-  log: 'trace',
+aggregateRowsToDocs(records).then(data => {
+  writeFileSync(outFile, JSON.stringify(data));
 });
-
-const records = parse(readFileSync(process.argv[2], 'utf-8'), {columns: true})
-aggregateRowsToDocs(records).then(({rumors, answers}) =>
-  Promise.all([
-    writeToElasticSearch('rumors', rumors),
-    writeToElasticSearch('answers', answers),
-  ])
-);
 
 async function aggregateRowsToDocs(rows) {
   const rumors = []; // rumors docs to return
@@ -90,20 +83,6 @@ async function aggregateRowsToDocs(rows) {
   return {rumors, answers};
 }
 
-function writeToElasticSearch(indexName, records){
-  const body = [];
-
-  records.forEach(({id, ...doc}) => {
-    // action description
-    body.push({index: {_index: indexName, _type: 'basic', _id: id}});
-    // document
-    body.push(doc);
-  });
-
-  return client.bulk({
-    body
-  })
-}
 
 function findDuplication(texts, target) {
   let idx = -1;

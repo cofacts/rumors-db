@@ -5,10 +5,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "csv": "babel-node scripts/csvToElasticSearch.js",
+    "json": "babel-node scripts/jsonToElasticSearch.js",
+    "csv": "babel-node scripts/airtableCsvToJson.js `ls -r data/*.csv | head -n 1`",
     "schema": "babel-node db/loadSchema.js",
     "clear": "babel-node db/clear.js",
-    "seed": "npm run clear && npm run schema && npm run csv -- data/`ls -r data/ | head -n 1`",
+    "seed": "npm run clear && npm run schema && npm run json -- `ls -r data/*.json | head -n 1`",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
