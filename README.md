@@ -32,6 +32,9 @@ To prepare test DB, first start an elastic search server on port 62223:
 
 ```
 $ docker run -d -p "62223:9200" --name "rumors-test-db" elasticsearch
+# If it says 'The name "rumors-test-db" is already in use',
+# Just run:
+$ docker start rumors-test-db
 ```
 
 Then run this to reset the test database:
