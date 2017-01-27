@@ -32,6 +32,8 @@ function writeToElasticSearch(indexName, records) {
 const { rumors, answers } = JSON.parse(readFileSync(process.argv[2]));
 writeToElasticSearch('articles', rumors.map((article) => {
   article.references = [{ type: 'LINE' }];
+  article.replyIds = article.answerIds;
+  delete article.answerIds;
   return article;
 }));
 writeToElasticSearch('replies', answers.map((reply) => {
