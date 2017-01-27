@@ -15,9 +15,9 @@ const client = new elasticsearch.Client({
   log: 'trace',
 });
 
-const {rumors, answers} = JSON.parse(readFileSync(process.argv[2]));
-writeToElasticSearch('rumors', rumors);
-writeToElasticSearch('answers', answers);
+const { rumors, answers } = JSON.parse(readFileSync(process.argv[2]));
+writeToElasticSearch('articles', rumors);
+writeToElasticSearch('replies', answers);
 
 function writeToElasticSearch(indexName, records){
   const body = [];

@@ -1,2 +1,2 @@
-export {default as rumors} from './rumors';
-export {default as answers} from './answers';
+export { default as articles } from './articles';
+export { default as replies } from './replies';
