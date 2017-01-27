@@ -14,6 +14,7 @@ export default {
       properties: {
         type: { type: 'keyword' }, // LINE, URL, etc
         permalink: { type: 'keyword' }, // permalink to the resource if applicable
+        createdAt: { type: 'date' },
       },
     },
   },
