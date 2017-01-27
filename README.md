@@ -43,7 +43,7 @@ $ npm t
 $ docker run --rm -it -v `pwd`:/srv -w /srv  -e 'NODE_ENV=test' kkarczmarczyk/node-yarn:6.9 npm t
 ```
 
-It connects to the test database, deletes all its existing data and then applies the lastest mappings on the test database.
+It connects to the test database, deletes all its existing data and then applies the latest mappings on the test database.
 
 ---
 

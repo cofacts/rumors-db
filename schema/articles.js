@@ -1,7 +1,7 @@
 export default {
   _all: { enabled: false },
   properties: {
-    answerIds: { type: 'keyword' },
+    replyIds: { type: 'keyword' },
     text: { type: 'text', analyzer: 'cjk' },
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
