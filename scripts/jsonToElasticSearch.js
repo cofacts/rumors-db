@@ -1,9 +1,8 @@
-import '../util/catchUnhandledRejection';
-
 import config from 'config';
 import elasticsearch from 'elasticsearch';
-
 import { readFileSync } from 'fs';
+
+import '../util/catchUnhandledRejection';
 
 if (process.argv.length !== 3) {
   console.log('Usage: babel-node scripts/jsonToElasticSearch.js <PATH_TO_CSV_FILE>');
@@ -14,10 +13,6 @@ const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
   log: 'trace',
 });
-
-const { rumors, answers } = JSON.parse(readFileSync(process.argv[2]));
-writeToElasticSearch('articles', rumors);
-writeToElasticSearch('replies', answers);
 
 function writeToElasticSearch(indexName, records) {
   const body = [];
@@ -33,3 +28,13 @@ function writeToElasticSearch(indexName, records) {
     body,
   });
 }
+
+const { rumors, answers } = JSON.parse(readFileSync(process.argv[2]));
+writeToElasticSearch('articles', rumors.map((article) => {
+  article.references = [{ type: 'LINE' }];
+  return article;
+}));
+writeToElasticSearch('replies', answers.map((reply) => {
+  reply.versions[0].type = reply.versions[0].type || 'RUMOR';
+  return reply;
+}));
