@@ -3,7 +3,7 @@ export default {
   properties: {
     versions: {
       properties: {
-        type: { type: 'keyword' }, // 'RUMOR', 'NON_RUMOR', 'NOT_ARTICLE'
+        type: { type: 'keyword' }, // 'RUMOR', 'NOT_RUMOR', 'NOT_ARTICLE'
         text: { type: 'text', analyzer: 'cjk' },
         reference: { type: 'text' },
         createdAt: { type: 'date' },
