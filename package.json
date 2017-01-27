@@ -5,6 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint --fix .",
     "json": "babel-node scripts/jsonToElasticSearch.js",
     "csv": "babel-node scripts/airtableCsvToJson.js `ls -r data/*.csv | head -n 1`",
     "schema": "babel-node db/loadSchema.js",
@@ -19,9 +20,18 @@
     "babel-preset-stage-3": "^6.17.0",
     "config": "^1.24.0",
     "csv": "^1.1.0",
+    "csv-parse": "^1.2.0",
     "elasticsearch": "^12.1.0",
     "node-fetch": "^1.6.3",
     "progress": "^1.1.8",
     "string-similarity": "^1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.14.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-import-resolver-babel-module": "^2.2.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0"
   }
 }
