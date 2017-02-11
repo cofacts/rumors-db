@@ -72,11 +72,11 @@ export default class DistanceDB {
     // an entry = {hash: hashed text for index, sanitizedText, text, payload}
     //
     this._shortEntries = []; // < 100 words
-    this._shortEntries._minHashDistThres = 8; // bits
+    this._shortEntries._minHashDistThres = 15; // bits
     this._mediumEntries = []; // 80 ~ 200 words
-    this._mediumEntries._minHashDistThres = 6; // bits
+    this._mediumEntries._minHashDistThres = 10; // bits
     this._longEntries = []; // 150+ words
-    this._longEntries._minHashDistThres = 3; // bits
+    this._longEntries._minHashDistThres = 5; // bits
 
     this.payloads = []; // all added payloads
   }
@@ -89,7 +89,7 @@ export default class DistanceDB {
     );
 
     const sanitizedText = sanitize(text);
-    console.log(`${candidates.length} / ${entries.length} entires are being scanned...`);
+    // console.log(`${candidates.length} / ${entries.length} entires are being scanned...`);
 
     return candidates.map(entry => ({
       similarity: compareTwoStrings(sanitizedText, entry.sanitizedText),

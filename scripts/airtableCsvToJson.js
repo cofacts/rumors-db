@@ -18,7 +18,7 @@ if (process.argv.length !== 3) {
 
 async function aggregateRowsToDocs(rows) {
   const rumorsDB = new DistanceDB(0.7, 0.4);
-  const answersDB = new DistanceDB(0.9, 0.7);
+  const answersDB = new DistanceDB(0.7, 0.4);
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length });
 
