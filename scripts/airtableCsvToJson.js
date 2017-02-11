@@ -1,8 +1,9 @@
+/* eslint no-await-in-loop: off */
 import { readFileSync, writeFileSync } from 'fs';
-import { compareTwoStrings } from 'string-similarity';
+
 import parse from 'csv-parse/lib/sync';
 import ProgressBar from 'progress';
-import readline from 'readline';
+import DistanceDB from './DistanceDB';
 import '../util/catchUnhandledRejection';
 
 const inFile = process.argv[2];
@@ -15,90 +16,35 @@ if (process.argv.length !== 3) {
   process.exit(1);
 }
 
-const MIN_SIMILARITY = 0.4;
-const SAFE_SIMILARITY = 0.7;
-
-
-function findDuplication(texts, target) {
-  let idx = -1;
-  let bestSimilarity = MIN_SIMILARITY;
-
-  texts.forEach((text, i) => {
-    const similarity = compareTwoStrings(text, target);
-    if (similarity > bestSimilarity) {
-      idx = i;
-      bestSimilarity = similarity;
-    }
-  });
-
-  return { idx, similarity: bestSimilarity };
-}
-
-function askSimilarity(doc1, doc2) {
-  return new Promise((resolve) => {
-    console.log('\n==============================');
-    console.log(doc1);
-    console.log('------------------------------');
-    console.log(doc2);
-    console.log('==============================\n');
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question('Are these 2 documents the same? (Y/n)', (ans) => {
-      if (ans === 'n') resolve(false);
-      else resolve(true);
-      rl.close();
-    });
-  });
-}
-
 async function aggregateRowsToDocs(rows) {
-  const rumors = []; // rumors docs to return
-  const answers = []; // answer docs to return
-  const rumorTexts = []; // cached text array. Should be 1-1 mapping to rumors[].
-  const answerTexts = []; // cached text array. Should be 1-1 mapping to answers[].
+  const rumorsDB = new DistanceDB(0.7, 0.4);
+  const answersDB = new DistanceDB(0.9, 0.7);
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length });
 
   for (const record of rows) {
     let rumor;
     const rumorText = record['Rumor Text'];
-    const { idx: rumorIdx, similarity: rumorSimilarity } = findDuplication(rumorTexts, rumorText);
+    const entry = await rumorsDB.findDuplication(rumorText);
 
-    if (
-      rumorIdx !== -1 && (
-        rumorSimilarity > SAFE_SIMILARITY ||
-        console.log('\nSimilarity =', rumorSimilarity) || await askSimilarity(rumors[rumorIdx].text, rumorText)
-      )
-    ) {
-      rumor = rumors[rumorIdx];
+    if (entry) {
+      rumor = entry;
     } else {
       rumor = {
         id: `${record['Message ID']}-rumor`,
         text: rumorText,
         answerIds: [],
       };
-      rumors.push(rumor);
-      rumorTexts.push(rumorText);
+      rumorsDB.add(rumorText, rumor);
     }
 
     if (record.Answer) {
       const answerText = record.Answer;
-      const {
-        idx: answerIdx,
-        similarity: answerSimilarity,
-      } = findDuplication(answerTexts, answerText);
+      const answerEntry = await answersDB.findDuplication(answerText);
       let answer;
 
-      if (answerIdx !== -1 && (
-        answerSimilarity > SAFE_SIMILARITY ||
-        console.log(
-          '\nSimilarity =', answerSimilarity) ||
-          await askSimilarity(answers[answerIdx].versions[0].text, answerText,
-        )
-      )) {
-        answer = answers[answerIdx];
+      if (answerEntry) {
+        answer = answerEntry;
       } else {
         answer = {
           id: `${record['Message ID']}-answer`,
@@ -107,8 +53,7 @@ async function aggregateRowsToDocs(rows) {
             reference: record.Reference,
           }],
         };
-        answers.push(answer);
-        answerTexts.push(answerText);
+        answersDB.add(answerText, answer);
       }
 
       rumor.answerIds.push(answer.id);
@@ -117,7 +62,7 @@ async function aggregateRowsToDocs(rows) {
     bar.tick();
   }
 
-  return { rumors, answers };
+  return { rumors: rumorsDB.payloads, answers: answersDB.payloads };
 }
 
 
