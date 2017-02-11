@@ -6,7 +6,12 @@ import sha1 from 'sha1';
 const simhash = SimHash();
 
 function sanitize(str) {
-  return str.replace(/[\n\r ,.!()~:;"'“”，。！（）～：；「」『』]/g, '');
+  return str
+    // URL -> hash
+    .replace(/(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim, (match, p1) => `URL[${sha1(p1)}]`)
+
+    // non-content words
+    .replace(/[\n\r ,.!()~:;"'“”，。！（）～：；「」『』]/g, '');
 }
 
 function toBigram(str) {
@@ -33,18 +38,18 @@ function hammingDistance(bits1, bits2, maxDist = 10) {
 
 const askSimilarityMemoization = {};
 
-function askSimilarity(doc1, doc2) {
+function askSimilarity(doc1, doc2, similarity) {
   const memoizationKey = `${sha1(doc1)}|${sha1(doc2)}`;
   if (typeof askSimilarityMemoization[memoizationKey] !== 'undefined') {
     return Promise.resolve(askSimilarityMemoization[memoizationKey]);
   }
 
   return new Promise((resolve) => {
-    console.log('\n==============================');
+    console.log('\n======================================\n');
     console.log(doc1);
-    console.log('------------------------------');
+    console.log(`\n ^^^^^^^^ Similarty = ${similarity.toFixed(4)} vvvvvvvv\n`);
     console.log(doc2);
-    console.log('==============================\n');
+    console.log('\n======================================\n');
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -72,11 +77,11 @@ export default class DistanceDB {
     // an entry = {hash: hashed text for index, sanitizedText, text, payload}
     //
     this._shortEntries = []; // < 100 words
-    this._shortEntries._minHashDistThres = 15; // bits
+    this._shortEntries._minHashDistThres = 12; // bits
     this._mediumEntries = []; // 80 ~ 200 words
-    this._mediumEntries._minHashDistThres = 10; // bits
+    this._mediumEntries._minHashDistThres = 8; // bits
     this._longEntries = []; // 150+ words
-    this._longEntries._minHashDistThres = 5; // bits
+    this._longEntries._minHashDistThres = 4; // bits
 
     this.payloads = []; // all added payloads
   }
@@ -122,7 +127,9 @@ export default class DistanceDB {
 
     if (bestSimilarity > this._safeSimilarity) return bestMatchEntry.payload;
 
-    return (await askSimilarity(bestMatchEntry.text, text)) ? bestMatchEntry.payload : null;
+    return (await askSimilarity(bestMatchEntry.text, text, bestSimilarity)) ?
+      bestMatchEntry.payload :
+      null;
   }
 
   add(textToIndex, payload) {
