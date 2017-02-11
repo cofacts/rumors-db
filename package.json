@@ -27,6 +27,7 @@
     "jest": "^18.1.0",
     "node-fetch": "^1.6.3",
     "progress": "^1.1.8",
+    "sha1": "^1.1.1",
     "simhash": "https://github.com/authbox-lib/simhash.git",
     "string-similarity": "^1.1.0"
   },

@@ -1,6 +1,7 @@
 import { compareTwoStrings } from 'string-similarity';
 import SimHash from 'simhash';
 import readline from 'readline';
+import sha1 from 'sha1';
 
 const simhash = SimHash();
 
@@ -30,7 +31,14 @@ function hammingDistance(bits1, bits2, maxDist = 10) {
   return dist;
 }
 
+const askSimilarityMemoization = {};
+
 function askSimilarity(doc1, doc2) {
+  const memoizationKey = `${sha1(doc1)}|${sha1(doc2)}`;
+  if (typeof askSimilarityMemoization[memoizationKey] !== 'undefined') {
+    return Promise.resolve(askSimilarityMemoization[memoizationKey]);
+  }
+
   return new Promise((resolve) => {
     console.log('\n==============================');
     console.log(doc1);
@@ -46,6 +54,9 @@ function askSimilarity(doc1, doc2) {
       else resolve(false);
       rl.close();
     });
+  }).then((value) => {
+    askSimilarityMemoization[memoizationKey] = value;
+    return value;
   });
 }
 
