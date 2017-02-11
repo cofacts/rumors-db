@@ -1,4 +1,6 @@
 import { compareTwoStrings } from 'string-similarity';
+import path from 'path';
+import { readFileSync, writeFile } from 'fs';
 import SimHash from 'simhash';
 import readline from 'readline';
 import sha1 from 'sha1';
@@ -36,12 +38,22 @@ function hammingDistance(bits1, bits2, maxDist = 10) {
   return dist;
 }
 
-const askSimilarityMemoization = {};
+const memoizationMapFileName = path.join(__dirname, 'resolveSimilarity.json');
+let askSimilarityMemoization;
+
+try {
+  askSimilarityMemoization = JSON.parse(
+    readFileSync(memoizationMapFileName, 'utf8'),
+  );
+} catch (e) {
+  console.error('resolveSimilarity.json not found, initialize new memoization map...');
+  askSimilarityMemoization = {};
+}
 
 function askSimilarity(doc1, doc2, similarity) {
   const memoizationKey = `${sha1(doc1)}|${sha1(doc2)}`;
   if (typeof askSimilarityMemoization[memoizationKey] !== 'undefined') {
-    return Promise.resolve(askSimilarityMemoization[memoizationKey]);
+    return Promise.resolve(askSimilarityMemoization[memoizationKey].value);
   }
 
   return new Promise((resolve) => {
@@ -60,7 +72,11 @@ function askSimilarity(doc1, doc2, similarity) {
       rl.close();
     });
   }).then((value) => {
-    askSimilarityMemoization[memoizationKey] = value;
+    askSimilarityMemoization[memoizationKey] = {
+      value, doc1, doc2,
+    };
+    // Write to json, but don't care about callback
+    writeFile(memoizationMapFileName, JSON.stringify(askSimilarityMemoization, null, '  '));
     return value;
   });
 }
