@@ -17,7 +17,7 @@ if (process.argv.length !== 3) {
 }
 
 async function aggregateRowsToDocs(rows) {
-  const rumorsDB = new DistanceDB(0.7, 0.4);
+  const rumorsDB = new DistanceDB(0.6, 0.4);
   const answersDB = new DistanceDB(0.7, 0.4);
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length });
@@ -29,6 +29,10 @@ async function aggregateRowsToDocs(rows) {
 
     if (entry) {
       rumor = entry;
+      if (entry.text.length < rumorText.length) {
+        // This new rumor is longer, replace the old rumor text
+        rumor.text = rumorText;
+      }
     } else {
       rumor = {
         id: `${record['Message ID']}-rumor`,
