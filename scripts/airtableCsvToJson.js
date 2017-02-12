@@ -46,8 +46,8 @@ async function aggregateRowsToDocs(rows) {
       rumor = {
         id: `${record['Message ID']}-rumor`,
         text: rumorText,
-        replyIds: [],
-        replyRequestIds: [],
+        replyIds: new Set(),
+        replyRequestIds: new Set(),
         createdAt: receivedDate,
         updatedAt: receivedDate,
         references: [{ type: 'LINE', createdAt: receivedDate }],
@@ -64,7 +64,7 @@ async function aggregateRowsToDocs(rows) {
 
     if (!replyRequestsByIds[replyRequest.id]) {
       replyRequestsByIds[replyRequest.id] = replyRequest;
-      rumor.replyRequestIds.push(replyRequest.id);
+      rumor.replyRequestIds.add(replyRequest.id);
     }
 
     if (record.Answer) {
@@ -87,14 +87,18 @@ async function aggregateRowsToDocs(rows) {
         answersDB.add(answerText, answer);
       }
 
-      rumor.replyIds.push(answer.id);
+      rumor.replyIds.add(answer.id);
     }
 
     bar.tick();
   }
 
   return {
-    rumors: rumorsDB.payloads,
+    rumors: rumorsDB.payloads.map(rumor => ({
+      ...rumor,
+      replyIds: Array.from(rumor.replyIds),
+      replyRequestIds: Array.from(rumor.replyRequestIds),
+    })),
     answers: answersDB.payloads,
     replyRequests: Object.keys(replyRequestsByIds).map(k => replyRequestsByIds[k]),
   };
