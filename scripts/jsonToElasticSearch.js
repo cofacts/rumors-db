@@ -31,10 +31,16 @@ function writeToElasticSearch(indexName, records) {
   });
 }
 
-const { rumors, answers } = JSON.parse(readFileSync(process.argv[2]));
+const {
+  rumors,
+  answers,
+  replyRequests = [],
+} = JSON.parse(readFileSync(process.argv[2]));
 writeToElasticSearch('articles', rumors.map((article) => {
-  article.references = [{ type: 'LINE' }];
-  article.replyIds = article.answerIds;
+  // Old JSONs don't have references and replyIds.
+  //
+  article.references = article.references || [{ type: 'LINE' }];
+  article.replyIds = article.replyIds || article.answerIds;
   delete article.answerIds;
   return article;
 }));
@@ -42,3 +48,4 @@ writeToElasticSearch('replies', answers.map((reply) => {
   reply.versions[0].type = reply.versions[0].type || 'RUMOR';
   return reply;
 }));
+writeToElasticSearch('replyrequests', replyRequests);

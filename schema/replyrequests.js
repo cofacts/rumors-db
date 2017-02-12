@@ -4,8 +4,6 @@
 export default {
   _all: { enabled: false },
   properties: {
-    articleId: { type: 'keyword' },
-
     // only recognizable for within a client.
     //
     userId: { type: 'keyword' },

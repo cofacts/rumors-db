@@ -11,6 +11,12 @@ const outFile = inFile.replace(/.csv$/, '.json');
 
 const records = parse(readFileSync(inFile, 'utf-8'), { columns: true });
 
+const TO_REPLY_TYPE = {
+  'Rumor sample': 'RUMOR',
+  'Non-rumor sample': 'NOT_RUMOR',
+  "Don't use": 'NOT_ARTICLE',
+};
+
 if (process.argv.length !== 3) {
   console.log('Usage: babel-node scripts/airtableCsvToJson.js <PATH_TO_CSV_FILE>');
   process.exit(1);
@@ -19,6 +25,7 @@ if (process.argv.length !== 3) {
 async function aggregateRowsToDocs(rows) {
   const rumorsDB = new DistanceDB(0.6, 0.4);
   const answersDB = new DistanceDB(0.7, 0.4);
+  const replyRequestsByIds = {};
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length });
 
@@ -37,9 +44,25 @@ async function aggregateRowsToDocs(rows) {
       rumor = {
         id: `${record['Message ID']}-rumor`,
         text: rumorText,
-        answerIds: [],
+        replyIds: [],
+        replyRequestIds: [],
+        createdAt: record['Received Date'],
+        updatedAt: record['Received Date'],
+        references: [{ type: 'LINE', createdAt: record['Received Date'] }],
       };
       rumorsDB.add(rumorText, rumor);
+    }
+
+    const replyRequest = {
+      id: `${record['Message ID']}-replyRequest`,
+      userId: '',
+      from: 'BOT_LEGACY',
+      createdAt: record['Received Date'],
+    };
+
+    if (!replyRequestsByIds[replyRequest.id]) {
+      replyRequestsByIds[replyRequest.id] = replyRequest;
+      rumor.replyRequestIds.push(replyRequest.id);
     }
 
     if (record.Answer) {
@@ -53,20 +76,26 @@ async function aggregateRowsToDocs(rows) {
         answer = {
           id: `${record['Message ID']}-answer`,
           versions: [{
+            type: TO_REPLY_TYPE[record.Type] || 'RUMOR', // some editors forgot to write type...
             text: record.Answer,
             reference: record.Reference,
+            createdAt: record['Received Date'],
           }],
         };
         answersDB.add(answerText, answer);
       }
 
-      rumor.answerIds.push(answer.id);
+      rumor.replyIds.push(answer.id);
     }
 
     bar.tick();
   }
 
-  return { rumors: rumorsDB.payloads, answers: answersDB.payloads };
+  return {
+    rumors: rumorsDB.payloads,
+    answers: answersDB.payloads,
+    replyRequests: Object.keys(replyRequestsByIds).map(k => replyRequestsByIds[k]),
+  };
 }
 
 
