@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'fs';
 
 import parse from 'csv-parse/lib/sync';
 import ProgressBar from 'progress';
+import moment from 'moment';
 import DistanceDB from './DistanceDB';
 import '../util/catchUnhandledRejection';
 
@@ -32,6 +33,7 @@ async function aggregateRowsToDocs(rows) {
   for (const record of rows) {
     let rumor;
     const rumorText = record['Rumor Text'];
+    const receivedDate = moment(record['Received Date'], 'YYYY年MM月DD日 HH:mm');
     const entry = await rumorsDB.findDuplication(rumorText);
 
     if (entry) {
@@ -46,9 +48,9 @@ async function aggregateRowsToDocs(rows) {
         text: rumorText,
         replyIds: [],
         replyRequestIds: [],
-        createdAt: record['Received Date'],
-        updatedAt: record['Received Date'],
-        references: [{ type: 'LINE', createdAt: record['Received Date'] }],
+        createdAt: receivedDate,
+        updatedAt: receivedDate,
+        references: [{ type: 'LINE', createdAt: receivedDate }],
       };
       rumorsDB.add(rumorText, rumor);
     }
@@ -57,7 +59,7 @@ async function aggregateRowsToDocs(rows) {
       id: `${record['Message ID']}-replyRequest`,
       userId: '',
       from: 'BOT_LEGACY',
-      createdAt: record['Received Date'],
+      createdAt: receivedDate,
     };
 
     if (!replyRequestsByIds[replyRequest.id]) {
@@ -79,7 +81,7 @@ async function aggregateRowsToDocs(rows) {
             type: TO_REPLY_TYPE[record.Type] || 'RUMOR', // some editors forgot to write type...
             text: record.Answer,
             reference: record.Reference,
-            createdAt: record['Received Date'],
+            createdAt: receivedDate,
           }],
         };
         answersDB.add(answerText, answer);
@@ -100,5 +102,5 @@ async function aggregateRowsToDocs(rows) {
 
 
 aggregateRowsToDocs(records).then((data) => {
-  writeFileSync(outFile, JSON.stringify(data));
+  writeFileSync(outFile, JSON.stringify(data, null, '  '));
 });
