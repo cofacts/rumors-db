@@ -17,8 +17,7 @@
   },
   "dependencies": {
     "babel-cli": "^6.18.0",
-    "babel-preset-es2015-node6": "^0.4.0",
-    "babel-preset-es2017": "^6.16.0",
+    "babel-preset-env": "^1.1.8",
     "babel-preset-stage-3": "^6.17.0",
     "config": "^1.24.0",
     "csv": "^1.1.0",
