@@ -1,7 +1,7 @@
 export default {
   _all: { enabled: false },
   properties: {
-    replyIds: { type: 'keyword' },
+    replyConnectionIds: { type: 'keyword' },
     replyRequestIds: { type: 'keyword' },
 
     text: { type: 'text', analyzer: 'cjk' },

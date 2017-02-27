@@ -27,6 +27,7 @@ async function aggregateRowsToDocs(rows) {
   const rumorsDB = new DistanceDB(0.6, 0.4);
   const answersDB = new DistanceDB(0.7, 0.4);
   const replyRequestsByIds = {};
+  const replyConnectionsByIds = {};
 
   const bar = new ProgressBar('Aggregating Rows :bar', { total: rows.length });
 
@@ -46,7 +47,7 @@ async function aggregateRowsToDocs(rows) {
       rumor = {
         id: `${record['Message ID']}-rumor`,
         text: rumorText,
-        replyIds: new Set(),
+        replyConnectionIds: new Set(),
         replyRequestIds: new Set(),
         createdAt: receivedDate,
         updatedAt: receivedDate,
@@ -87,7 +88,19 @@ async function aggregateRowsToDocs(rows) {
         answersDB.add(answerText, answer);
       }
 
-      rumor.replyIds.add(answer.id);
+
+      const replyConnection = {
+        id: `${rumor.id}__${answer.id}`,
+        replyId: answer.id,
+        userId: '',
+        from: 'BOT_LEGACY',
+        feedbackIds: [],
+      };
+
+      if (!replyConnectionsByIds[replyConnection.id]) {
+        replyConnectionsByIds[replyConnection.id] = replyConnection;
+        rumor.replyConnectionIds.add(replyConnection.id);
+      }
     }
 
     bar.tick();
@@ -96,11 +109,12 @@ async function aggregateRowsToDocs(rows) {
   return {
     rumors: rumorsDB.payloads.map(rumor => ({
       ...rumor,
-      replyIds: Array.from(rumor.replyIds),
+      replyConnectionIds: Array.from(rumor.replyConnectionIds),
       replyRequestIds: Array.from(rumor.replyRequestIds),
     })),
     answers: answersDB.payloads,
     replyRequests: Object.keys(replyRequestsByIds).map(k => replyRequestsByIds[k]),
+    replyConnections: Object.keys(replyConnectionsByIds).map(k => replyConnectionsByIds[k]),
   };
 }
 

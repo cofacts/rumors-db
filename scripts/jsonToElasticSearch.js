@@ -35,12 +35,13 @@ const {
   rumors,
   answers,
   replyRequests = [],
+  replyConnections = [],
 } = JSON.parse(readFileSync(process.argv[2]));
 writeToElasticSearch('articles', rumors.map((article) => {
   // Old JSONs don't have references and replyIds.
   //
   article.references = article.references || [{ type: 'LINE' }];
-  article.replyIds = article.replyIds || article.answerIds;
+  article.replyConnectionIds = article.replyConnectionIds || article.replyIds || article.answerIds;
   delete article.answerIds;
   return article;
 }));
@@ -49,3 +50,4 @@ writeToElasticSearch('replies', answers.map((reply) => {
   return reply;
 }));
 writeToElasticSearch('replyrequests', replyRequests);
+writeToElasticSearch('replyconnections', replyConnections);
