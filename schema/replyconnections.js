@@ -18,5 +18,8 @@ export default {
     // May be lots of feedbacks, thus split into another index.
     // Put foreign keys here, again, for getting total number of feedbacks fast.
     feedbackIds: { type: 'keyword' },
+
+    createdAt: { type: 'date' },
+    updatedAt: { type: 'date' },
   },
 };

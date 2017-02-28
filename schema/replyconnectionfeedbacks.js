@@ -8,5 +8,7 @@ export default {
     // Should be one of backend APP ID, 'BOT_LEGACY', 'RUMORS_LINE_BOT' or 'WEBSITE'
     from: { type: 'keyword' },
     comment: { type: 'text', analyzer: 'cjk' },
+    createdAt: { type: 'date' },
+    updatedAt: { type: 'date' },
   },
 };
