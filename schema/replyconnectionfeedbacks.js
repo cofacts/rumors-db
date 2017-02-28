@@ -5,7 +5,7 @@ export default {
     userId: { type: 'keyword' },
 
     // The user submits the feedback with which client.
-    // Should be something like API-key in the future.
+    // Should be one of APP ID, 'BOT_LEGACY', 'RUMORS_LINE_BOT' or 'RUMORS_SITE'
     from: { type: 'keyword' },
     comment: { type: 'text', analyzer: 'cjk' },
   },

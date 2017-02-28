@@ -13,7 +13,7 @@ export default {
     // Who connected the replyId with the article.
     //
     userId: { type: 'keyword' },
-    from: {type: 'keyword'},
+    from: { type: 'keyword' },
 
     // May be lots of feedbacks, thus split into another index.
     // Put foreign keys here, again, for getting total number of feedbacks fast.
