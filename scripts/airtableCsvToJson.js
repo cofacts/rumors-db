@@ -52,6 +52,8 @@ async function aggregateRowsToDocs(rows) {
         createdAt: receivedDate,
         updatedAt: receivedDate,
         references: [{ type: 'LINE', createdAt: receivedDate }],
+        userId: '',
+        from: 'BOT_LEGACY',
       };
       rumorsDB.add(rumorText, rumor);
     }
@@ -95,6 +97,8 @@ async function aggregateRowsToDocs(rows) {
         userId: '',
         from: 'BOT_LEGACY',
         feedbackIds: [],
+        createdAt: receivedDate,
+        updatedAt: receivedDate,
       };
 
       if (!replyConnectionsByIds[replyConnection.id]) {

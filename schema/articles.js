@@ -8,6 +8,9 @@ export default {
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
 
+    userId: { type: 'keyword' },
+    from: { type: 'keyword' },
+
     // Where this article is posted.
     // An article may be seen in multiple places, like blogs, FB posts or LINE messages.
     // "references" field should be a list of such occurences.
