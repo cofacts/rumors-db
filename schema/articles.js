@@ -4,7 +4,7 @@ export default {
     replyConnectionIds: { type: 'keyword' },
     replyRequestIds: { type: 'keyword' },
 
-    text: { type: 'text', analyzer: 'cjk' },
+    text: { type: 'text', analyzer: 'cjk_url_email' },
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
 
