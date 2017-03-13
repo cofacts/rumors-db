@@ -2,6 +2,10 @@ export default {
   _all: { enabled: false },
   properties: {
     replyConnectionIds: { type: 'keyword' },
+
+    // when user deletes a reply from article, its replies goes to here
+    deletedReplyConnectionIds: { type: 'keyword' },
+
     replyRequestIds: { type: 'keyword' },
 
     text: { type: 'text', analyzer: 'cjk_url_email' },
