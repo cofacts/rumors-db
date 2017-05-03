@@ -1,6 +1,8 @@
 Scripts for managing rumors db
 ==========
 
+[![Build Status](https://travis-ci.org/cofacts/rumors-db.svg?branch=master)](https://travis-ci.org/cofacts/rumors-db)
+
 If you do not have `npm` and `yarn` installed, please see [Run with docker](#run-with-docker) section below.
 
 ##Installation
