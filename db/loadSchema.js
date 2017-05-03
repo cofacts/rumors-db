@@ -1,3 +1,5 @@
+/*eslint import/namespace: ['error', { allowComputed: true }]*/
+
 import config from 'config';
 import elasticsearch from 'elasticsearch';
 import '../util/catchUnhandledRejection';
@@ -9,37 +11,39 @@ const client = new elasticsearch.Client({
   log: 'trace',
 });
 
-Object.keys(schema).forEach((index) => {
-  client.indices.create({
-    index,
-    body: {
-      settings: {
-        number_of_shards: 1,
-        index: {
-          analysis: {
-            filter: {
-              english_stop: {
-                type: "stop",
-                stopwords: "_english_"
-              }
+Object.keys(schema).forEach(index => {
+  client.indices
+    .create({
+      index,
+      body: {
+        settings: {
+          number_of_shards: 1,
+          index: {
+            analysis: {
+              filter: {
+                english_stop: {
+                  type: 'stop',
+                  stopwords: '_english_',
+                },
+              },
+              analyzer: {
+                cjk_url_email: {
+                  tokenizer: 'uax_url_email',
+                  filter: [
+                    'cjk_width',
+                    'lowercase',
+                    'cjk_bigram',
+                    'english_stop',
+                  ],
+                },
+              },
             },
-            analyzer: {
-              cjk_url_email: {
-                tokenizer: "uax_url_email",
-                filter: [
-                  "cjk_width",
-                  "lowercase",
-                  "cjk_bigram",
-                  "english_stop"
-                ]
-              }
-            }
-          }
-        }
+          },
+        },
+        mappings: { basic: schema[index] },
       },
-      mappings: { basic: schema[index] },
-    },
-  }).then(() => {
-    console.log(`Index "${index}" created with mappings`);
-  });
+    })
+    .then(() => {
+      console.log(`Index "${index}" created with mappings`);
+    });
 });

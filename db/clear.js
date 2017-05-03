@@ -9,10 +9,12 @@ const client = new elasticsearch.Client({
   log: 'trace',
 });
 
-Object.keys(schema).forEach((index) => {
-  client.indices.delete({
-    index,
-  }).then(() => {
-    console.log(`Index "${index}" deleted.`);
-  });
+Object.keys(schema).forEach(index => {
+  client.indices
+    .delete({
+      index,
+    })
+    .then(() => {
+      console.log(`Index "${index}" deleted.`);
+    });
 });

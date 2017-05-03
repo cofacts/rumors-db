@@ -19,7 +19,9 @@ const TO_REPLY_TYPE = {
 };
 
 if (process.argv.length !== 3) {
-  console.log('Usage: babel-node scripts/airtableCsvToJson.js <PATH_TO_CSV_FILE>');
+  console.log(
+    'Usage: babel-node scripts/airtableCsvToJson.js <PATH_TO_CSV_FILE>'
+  );
   process.exit(1);
 }
 
@@ -80,16 +82,17 @@ async function aggregateRowsToDocs(rows) {
       } else {
         answer = {
           id: `${record['Message ID']}-answer`,
-          versions: [{
-            type: TO_REPLY_TYPE[record.Type] || 'RUMOR', // some editors forgot to write type...
-            text: record.Answer,
-            reference: record.Reference,
-            createdAt: receivedDate,
-          }],
+          versions: [
+            {
+              type: TO_REPLY_TYPE[record.Type] || 'RUMOR', // some editors forgot to write type...
+              text: record.Answer,
+              reference: record.Reference,
+              createdAt: receivedDate,
+            },
+          ],
         };
         answersDB.add(answerText, answer);
       }
-
 
       const replyConnection = {
         id: `${rumor.id}__${answer.id}`,
@@ -117,12 +120,15 @@ async function aggregateRowsToDocs(rows) {
       replyRequestIds: Array.from(rumor.replyRequestIds),
     })),
     answers: answersDB.payloads,
-    replyRequests: Object.keys(replyRequestsByIds).map(k => replyRequestsByIds[k]),
-    replyConnections: Object.keys(replyConnectionsByIds).map(k => replyConnectionsByIds[k]),
+    replyRequests: Object.keys(replyRequestsByIds).map(
+      k => replyRequestsByIds[k]
+    ),
+    replyConnections: Object.keys(replyConnectionsByIds).map(
+      k => replyConnectionsByIds[k]
+    ),
   };
 }
 
-
-aggregateRowsToDocs(records).then((data) => {
+aggregateRowsToDocs(records).then(data => {
   writeFileSync(outFile, JSON.stringify(data, null, '  '));
 });

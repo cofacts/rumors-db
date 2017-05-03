@@ -8,12 +8,16 @@ import sha1 from 'sha1';
 const simhash = SimHash();
 
 function sanitize(str) {
-  return str
-    // URL -> hash
-    .replace(/(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim, (match, p1) => `URL[${sha1(p1)}]`)
-
-    // non-content words
-    .replace(/[\n\r ,.!()~:;"'“”，。！（）～：；「」『』]/g, '');
+  return (
+    str
+      // URL -> hash
+      .replace(
+        /(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim,
+        (match, p1) => `URL[${sha1(p1)}]`
+      )
+      // non-content words
+      .replace(/[\n\r ,.!()~:;"'“”，。！（）～：；「」『』]/g, '')
+  );
 }
 
 function toBigram(str) {
@@ -43,10 +47,12 @@ let askSimilarityMemoization;
 
 try {
   askSimilarityMemoization = JSON.parse(
-    readFileSync(memoizationMapFileName, 'utf8'),
+    readFileSync(memoizationMapFileName, 'utf8')
   );
 } catch (e) {
-  console.error('resolveSimilarity.json not found, initialize new memoization map...');
+  console.error(
+    'resolveSimilarity.json not found, initialize new memoization map...'
+  );
   askSimilarityMemoization = {};
 }
 
@@ -56,7 +62,7 @@ function askSimilarity(doc1, doc2, similarity) {
     return Promise.resolve(askSimilarityMemoization[memoizationKey].value);
   }
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     console.log('\n======================================\n');
     console.log(doc1);
     console.log(`\n ^^^^^^^^ Similarty = ${similarity.toFixed(4)} vvvvvvvv\n`);
@@ -66,17 +72,22 @@ function askSimilarity(doc1, doc2, similarity) {
       input: process.stdin,
       output: process.stdout,
     });
-    rl.question('Are these 2 documents the same? (y/N)', (ans) => {
+    rl.question('Are these 2 documents the same? (y/N)', ans => {
       if (ans === 'y') resolve(true);
       else resolve(false);
       rl.close();
     });
-  }).then((value) => {
+  }).then(value => {
     askSimilarityMemoization[memoizationKey] = {
-      value, doc1, doc2,
+      value,
+      doc1,
+      doc2,
     };
     // Write to json, but don't care about callback
-    writeFile(memoizationMapFileName, JSON.stringify(askSimilarityMemoization, null, '  '));
+    writeFile(
+      memoizationMapFileName,
+      JSON.stringify(askSimilarityMemoization, null, '  ')
+    );
     return value;
   });
 }
@@ -106,22 +117,25 @@ export default class DistanceDB {
     const hash = toSimHash(text);
     const maxDist = entries._minHashDistThres;
     const candidates = entries.filter(
-      entry => hammingDistance(entry.hash, hash, maxDist) <= maxDist,
+      entry => hammingDistance(entry.hash, hash, maxDist) <= maxDist
     );
 
     const sanitizedText = sanitize(text);
     // console.log(`${candidates.length} / ${entries.length} entires are being scanned...`);
 
-    return candidates.map(entry => ({
-      similarity: compareTwoStrings(sanitizedText, entry.sanitizedText),
-      entry,
-    })).filter(({ similarity }) => similarity > this._minSimiarity);
+    return candidates
+      .map(entry => ({
+        similarity: compareTwoStrings(sanitizedText, entry.sanitizedText),
+        entry,
+      }))
+      .filter(({ similarity }) => similarity > this._minSimiarity);
   }
 
   _binsToCheck(sanitizedTextLength) {
     const bins = [];
     if (sanitizedTextLength < 100) bins.push(this._shortEntries);
-    if (sanitizedTextLength > 80 && sanitizedTextLength < 200) bins.push(this._mediumEntries);
+    if (sanitizedTextLength > 80 && sanitizedTextLength < 200)
+      bins.push(this._mediumEntries);
     if (sanitizedTextLength > 150) bins.push(this._longEntries);
     return bins;
   }
@@ -130,8 +144,11 @@ export default class DistanceDB {
     let bestSimilarity = this._minSimiarity;
     let bestMatchEntry = null;
 
-    this._binsToCheck(sanitize(text).length).forEach((bin) => {
-      this._findDuplicateEntriesAndSimilarities(text, bin).forEach(({ entry, similarity }) => {
+    this._binsToCheck(sanitize(text).length).forEach(bin => {
+      this._findDuplicateEntriesAndSimilarities(
+        text,
+        bin
+      ).forEach(({ entry, similarity }) => {
         if (similarity > bestSimilarity) {
           bestSimilarity = similarity;
           bestMatchEntry = entry;
@@ -143,9 +160,9 @@ export default class DistanceDB {
 
     if (bestSimilarity > this._safeSimilarity) return bestMatchEntry.payload;
 
-    return (await askSimilarity(bestMatchEntry.text, text, bestSimilarity)) ?
-      bestMatchEntry.payload :
-      null;
+    return (await askSimilarity(bestMatchEntry.text, text, bestSimilarity))
+      ? bestMatchEntry.payload
+      : null;
   }
 
   add(textToIndex, payload) {
