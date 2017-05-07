@@ -49,27 +49,25 @@ async function aggregateRowsToDocs(rows) {
       rumor = {
         id: `${record['Message ID']}-rumor`,
         text: rumorText,
-        replyConnectionIds: new Set(),
-        replyRequestIds: new Set(),
         createdAt: receivedDate,
         updatedAt: receivedDate,
         references: [{ type: 'LINE', createdAt: receivedDate }],
         userId: '',
-        from: 'BOT_LEGACY',
+        appId: 'BOT_LEGACY',
       };
       rumorsDB.add(rumorText, rumor);
     }
 
     const replyRequest = {
       id: `${record['Message ID']}-replyRequest`,
+      _parent: rumor.id,
       userId: '',
-      from: 'BOT_LEGACY',
+      appId: 'BOT_LEGACY',
       createdAt: receivedDate,
     };
 
     if (!replyRequestsByIds[replyRequest.id]) {
       replyRequestsByIds[replyRequest.id] = replyRequest;
-      rumor.replyRequestIds.add(replyRequest.id);
     }
 
     if (record.Answer) {
@@ -96,17 +94,20 @@ async function aggregateRowsToDocs(rows) {
 
       const replyConnection = {
         id: `${rumor.id}__${answer.id}`,
+        _parent: rumor.id,
         replyId: answer.id,
         userId: '',
-        from: 'BOT_LEGACY',
-        feedbackIds: [],
+        appId: 'BOT_LEGACY',
         createdAt: receivedDate,
         updatedAt: receivedDate,
+        currentReply: answer.versions[0],
+        segment: rumorText,
+        segmentRange: { gte: 0, lte: rumorText.length - 1 },
+        status: 'NORMAL',
       };
 
       if (!replyConnectionsByIds[replyConnection.id]) {
         replyConnectionsByIds[replyConnection.id] = replyConnection;
-        rumor.replyConnectionIds.add(replyConnection.id);
       }
     }
 
@@ -114,11 +115,7 @@ async function aggregateRowsToDocs(rows) {
   }
 
   return {
-    rumors: rumorsDB.payloads.map(rumor => ({
-      ...rumor,
-      replyConnectionIds: Array.from(rumor.replyConnectionIds),
-      replyRequestIds: Array.from(rumor.replyRequestIds),
-    })),
+    rumors: rumorsDB.payloads,
     answers: answersDB.payloads,
     replyRequests: Object.keys(replyRequestsByIds).map(
       k => replyRequestsByIds[k]

@@ -19,9 +19,11 @@ const client = new elasticsearch.Client({
 function writeToElasticSearch(indexName, records) {
   const body = [];
 
-  records.forEach(({ id, ...doc }) => {
+  records.forEach(({ id, _parent, ...doc }) => {
     // action description
-    body.push({ index: { _index: indexName, _type: 'basic', _id: id } });
+    const index = { _index: indexName, _type: 'basic', _id: id };
+    if (_parent) index._parent = _parent;
+    body.push({ index });
     // document
     body.push(doc);
   });
