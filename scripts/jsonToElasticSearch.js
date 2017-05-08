@@ -16,12 +16,12 @@ const client = new elasticsearch.Client({
   log: 'info',
 });
 
-function writeToElasticSearch(indexName, records) {
+function writeToElasticSearch(indexName, typeName, records) {
   const body = [];
 
   records.forEach(({ id, _parent, ...doc }) => {
     // action description
-    const index = { _index: indexName, _type: 'basic', _id: id };
+    const index = { _index: indexName, _type: typeName, _id: id };
     if (_parent) index._parent = _parent;
     body.push({ index });
     // document
@@ -42,6 +42,7 @@ const {
   replyConnections = [],
 } = JSON.parse(readFileSync(process.argv[2]));
 writeToElasticSearch(
+  'data',
   'articles',
   rumors.map(article => {
     // Old JSONs don't have references and replyIds.
@@ -55,10 +56,11 @@ writeToElasticSearch(
 );
 writeToElasticSearch(
   'replies',
+  'basic',
   answers.map(reply => {
     reply.versions[0].type = reply.versions[0].type || 'RUMOR';
     return reply;
   })
 );
-writeToElasticSearch('replyrequests', replyRequests);
-writeToElasticSearch('replyconnections', replyConnections);
+writeToElasticSearch('data', 'replyrequests', replyRequests);
+writeToElasticSearch('data', 'replyconnections', replyConnections);
