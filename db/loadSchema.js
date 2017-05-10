@@ -40,7 +40,7 @@ Object.keys(schema).forEach(index => {
             },
           },
         },
-        mappings: { basic: schema[index] },
+        mappings: schema[index],
       },
     })
     .then(() => {
