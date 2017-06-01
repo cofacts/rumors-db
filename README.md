@@ -36,6 +36,30 @@ See [rumors-api](https://github.com/MrOrz/rumors-api)
 
 See [rumors-api](https://github.com/MrOrz/rumors-api)
 
+## Backup production database and run on local machine
+
+First of all, go to production machine, run:
+
+```
+$ docker inspect --format='{{json .Mounts}}' rumorsdeploy_db_1
+```
+
+Look at the returned `"Source"`. It should be a path like `/var/lib/docker/volumes/<some hash>/_data`. It is the path to the elastic search database.
+
+Use tar to pack up the data:
+```
+$ tar cvzf backup.tar.gz /var/lib/docker/volumes/<some hash>/_data
+```
+
+Then transfer `backup.tar.gz` to your machine using `scp` or `rsync` or anything you like.
+
+On your local machine, extract the tar file and put it in a directory (for simplicity's sake, let's name the directory `volume`.)
+
+Run this on your local machine to start a elasticsearch server on port `6226` with the downloaded data:
+
+```
+$ docker run -p 6226:9200/tcp -v "$PWD/volume":/usr/share/elasticsearch/data elasticsearch
+```
 
 ---
 
