@@ -41,10 +41,10 @@ See [rumors-api](https://github.com/MrOrz/rumors-api)
 First of all, go to production machine, run:
 
 ```
-$ docker inspect --format='{{json .Mounts}}' rumorsdeploy_db_1
+$ docker inspect --format='{{(index .Mounts 0).Source}}' rumorsdeploy_db_1
 ```
 
-Look at the returned `"Source"`. It should be a path like `/var/lib/docker/volumes/<some hash>/_data`. It is the path to the elastic search database.
+It should be a path like `/var/lib/docker/volumes/<some hash>/_data`. It is the path to the elastic search database.
 
 Use tar to pack up the data:
 ```
@@ -58,7 +58,7 @@ On your local machine, extract the tar file and put it in a directory (for simpl
 Run this on your local machine to start a elasticsearch server on port `6226` with the downloaded data:
 
 ```
-$ docker run -p 6226:9200/tcp -v "$PWD/volume":/usr/share/elasticsearch/data elasticsearch
+$ docker run -d -p 6226:9200/tcp -v "$PWD/volume":/usr/share/elasticsearch/data elasticsearch
 ```
 
 ---
