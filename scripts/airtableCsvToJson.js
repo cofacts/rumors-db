@@ -36,7 +36,10 @@ async function aggregateRowsToDocs(rows) {
   for (const record of rows) {
     let rumor;
     const rumorText = record['Rumor Text'];
-    const receivedDate = moment(record['Received Date'], 'YYYY年MM月DD日 HH:mm');
+    const receivedDate = moment(
+      record['Received Date'],
+      'YYYY年MM月DD日 HH:mm'
+    );
     const entry = await rumorsDB.findDuplication(rumorText);
 
     if (entry) {

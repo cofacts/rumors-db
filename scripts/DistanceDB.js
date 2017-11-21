@@ -145,15 +145,14 @@ export default class DistanceDB {
     let bestMatchEntry = null;
 
     this._binsToCheck(sanitize(text).length).forEach(bin => {
-      this._findDuplicateEntriesAndSimilarities(
-        text,
-        bin
-      ).forEach(({ entry, similarity }) => {
-        if (similarity > bestSimilarity) {
-          bestSimilarity = similarity;
-          bestMatchEntry = entry;
+      this._findDuplicateEntriesAndSimilarities(text, bin).forEach(
+        ({ entry, similarity }) => {
+          if (similarity > bestSimilarity) {
+            bestSimilarity = similarity;
+            bestMatchEntry = entry;
+          }
         }
-      });
+      );
     });
 
     if (!bestMatchEntry) return null;

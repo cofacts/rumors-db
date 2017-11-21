@@ -3,9 +3,7 @@
 import { default as articles } from './articles';
 import { default as replyrequests } from './replyrequests';
 import { default as replyconnections } from './replyconnections';
-import {
-  default as replyconnectionfeedbacks,
-} from './replyconnectionfeedbacks';
+import { default as replyconnectionfeedbacks } from './replyconnectionfeedbacks';
 
 export const data = {
   articles,
