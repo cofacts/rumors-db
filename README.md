@@ -57,6 +57,21 @@ Run this on your local machine to start a elasticsearch server on port `6226` wi
 $ docker run -d -p 6226:9200/tcp -v "$PWD/volume":/usr/share/elasticsearch/data elasticsearch
 ```
 
+## Gathering stats
+
+`npm run stats` gathers editor usage, articles and replies creation statistics into `stats/output`
+as CSV files.
+
+By default, the statistics are derived from elasticsearch in `localhost:6226`.
+
+To configure the elasticsearch host, please use:
+
+```
+$ HOST=http://some.host:port npm run stats
+```
+
+`HOST` defaults to `http://localhost:6226`.
+
 ---
 
 ## Other commands
