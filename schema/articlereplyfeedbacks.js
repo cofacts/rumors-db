@@ -1,9 +1,9 @@
 export default {
-  _all: { enabled: false },
-  _parent: {
-    type: 'replyconnections',
-  },
   properties: {
+    // // The article ID and reply ID is used in calculating replyrequests' ID.
+    articleId: { type: 'keyword' },
+    replyId: { type: 'keyword' },
+
     // Auth
     userId: { type: 'keyword' },
     // The user submits the feedback with which client.
@@ -11,7 +11,6 @@ export default {
     appId: { type: 'keyword' },
 
     score: { type: 'byte' }, // 1, 0, -1
-    comment: { type: 'text', analyzer: 'cjk' },
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
   },

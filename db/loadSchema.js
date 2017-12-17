@@ -3,6 +3,7 @@
 import config from 'config';
 import elasticsearch from 'elasticsearch';
 import '../util/catchUnhandledRejection';
+import { version } from '../package.json';
 
 import * as schema from '../schema';
 
@@ -12,9 +13,11 @@ const client = new elasticsearch.Client({
 });
 
 Object.keys(schema).forEach(index => {
+  const indexName = `${index}_v${version.replace(/\./g, '_')}`;
+
   client.indices
     .create({
-      index,
+      index: indexName,
       body: {
         settings: {
           number_of_shards: 1,
@@ -40,7 +43,10 @@ Object.keys(schema).forEach(index => {
             },
           },
         },
-        mappings: schema[index],
+        mappings: { doc: schema[index] },
+        aliases: {
+          [index]: {},
+        },
       },
     })
     .then(() => {

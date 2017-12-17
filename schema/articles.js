@@ -1,5 +1,4 @@
 export default {
-  _all: { enabled: false },
   properties: {
     text: { type: 'text', analyzer: 'cjk_url_email' },
     createdAt: { type: 'date' },
@@ -26,18 +25,35 @@ export default {
       },
     },
 
-    // Who said they want to reply.
-    //
-    pendingReplies: {
+    // Linkage between articles and replies
+    articleReplies: {
       type: 'nested',
       properties: {
-        createdAt: { type: 'date' },
-
-        // auth
+        // Who connected the replyId with the article.
+        //
         userId: { type: 'keyword' },
         appId: { type: 'keyword' },
+
+        // Counter cache for feedbacks
+        positiveFeedbackCount: { type: 'long' },
+        negativeFeedbackCount: { type: 'long' },
+
+        // One reply can have multipe replyconnections.
+        //
+        replyId: { type: 'keyword' },
+
+        // Current reply type
+        replyType: { type: 'keyword' },
+
+        status: { type: 'keyword' }, // NORMAL, DELETED
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
       },
     },
+
+    // Cached counter and timestamp from replyrequests
+    replyRequestCount: { type: 'long' },
+    lastRequestedAt: { type: 'date' },
 
     tags: { type: 'keyword' },
   },

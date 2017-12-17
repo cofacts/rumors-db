@@ -10,11 +10,12 @@ const client = new elasticsearch.Client({
 });
 
 Object.keys(schema).forEach(index => {
+  const indexName = `${index}_v*`;
   client.indices
     .delete({
-      index,
+      index: indexName,
     })
     .then(() => {
-      console.log(`Index "${index}" deleted.`);
+      console.log(`Index "${indexName}" deleted.`);
     });
 });
