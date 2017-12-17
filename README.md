@@ -11,26 +11,9 @@ Please first install Node.JS 8.
 $ npm i
 ```
 
-## Populate seed data for dev environments.
-
-Index mappings (schemas) are written in `schema/` directory. To seed the database for development, you should first start the development elastic search server using `docker-compose` as specified [rumors-api](https://github.com/MrOrz/rumors-api).
-
-Then run:
-
-```
-$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsapi_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' node:8 npm run seed
-```
-
-It connects to the database created clears all DB records and populates it with
-sample rumors & answers.
-
 ## Prepare database for unit test
 
-See [rumors-api](https://github.com/MrOrz/rumors-api)
-
-## Prepare database for search performance evaluation
-
-See [rumors-api](https://github.com/MrOrz/rumors-api)
+See [rumors-api](https://github.com/cofacts/rumors-api)
 
 ## Backup production database and run on local machine
 
@@ -49,13 +32,15 @@ $ tar cvzf backup.tar.gz /var/lib/docker/volumes/<some hash>/_data
 
 Then transfer `backup.tar.gz` to your machine using `scp` or `rsync` or anything you like.
 
-On your local machine, extract the tar file and put it in a directory (for simplicity's sake, let's name the directory `volume`.)
+On your local machine, extract the tar file and put it in `esdata` directory of this project's root.
 
-Run this on your local machine to start a elasticsearch server on port `6226` with the downloaded data:
+Then run:
 
 ```
-$ docker run -d -p 6226:9200/tcp -v "$PWD/volume":/usr/share/elasticsearch/data elasticsearch
+$ docker-compose up
 ```
+
+This spins up elasticsearch on `localhost:62223`, with Kibana available in `localhost:62223`, using the data in `esdata`.
 
 ## Gathering stats
 
@@ -71,6 +56,19 @@ $ HOST=http://some.host:port npm run stats
 ```
 
 `HOST` defaults to `http://localhost:6226`.
+
+## Populate seed data for dev environments.
+
+Index mappings (schemas) are written in `schema/` directory. To seed the database for development, you should first start the development elastic search server using `docker-compose` as specified [rumors-api](https://github.com/MrOrz/rumors-api).
+
+Then run:
+
+```
+$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsapi_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' node:8 npm run seed
+```
+
+It connects to the database created clears all DB records and populates it with
+sample rumors & answers.
 
 ---
 
@@ -89,28 +87,3 @@ Creates indices with specified mappings.
 ### `npm run json -- <JSON_FILEPATH>`
 
 Reads seed data from json file and write to ElasticSearch. (defaut to `localhost:62222`)
-
-
-### `npm run csv`
-
-Used to create JSON seed files from CSV files exported from Airtable.
-
-Reads seed data from csv file, analyze the duplicated rumors & answers, then write to JSON. (Default to the same directory of CSV_FILEPATH, but with `.json` postfix)
-
-
-## Run with docker
-
-On dev environments with docker but no node, use:
-
-```
-$ cd rumors-db
-$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsapi_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' node:8 npm run seed # or other npm commands
-```
-
-On production environments, use:
-
-```
-$ cd rumors-db
-$ docker run --rm -v `pwd`:/srv -w /srv node:8 npm i
-$ docker run --rm -it -v `pwd`:/srv -w /srv --network=rumorsdeploy_default -e 'NODE_CONFIG={"ELASTICSEARCH_URL":"http://db:9200"}' node:8 npm run seed # or other npm commands
-```
