@@ -3,13 +3,23 @@ Scripts for managing rumors db
 
 [![Build Status](https://travis-ci.org/cofacts/rumors-db.svg?branch=master)](https://travis-ci.org/cofacts/rumors-db)
 
-##Installation
+## Installation
 
 Please first install Node.JS 8.
 
 ```
 $ npm i
 ```
+
+## Index mapping versions
+
+All mappings exist in `schema/` directory, with `schema/index.js` being the entry point.
+
+When loading tschema into DB using `npm run schema`, it appends `_vX_Y_Z` in the created indecies,
+
+then create an alias to the index name, in which `X.Y.Z` is the version name in `package.json`.
+
+For example, the mappings in `schema/articles.js` would go to the index `articles_v1_0_0` and an alias from `articles` to `articles_v1_0_0` would be created after running `npm run schema`, given that the `version` in `package.json` is `1.0.0`.
 
 ## Prepare database for unit test
 
