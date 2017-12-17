@@ -14,6 +14,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.0
     volumes:
       - "./esdata:/usr/share/elasticsearch/data"
+      - "./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
     ports:
       - "62222:9200"
 
