@@ -21,6 +21,19 @@ then create an alias to the index name, in which `X.Y.Z` is the version name in 
 
 For example, the mappings in `schema/articles.js` would go to the index `articles_v1_0_0` and an alias from `articles` to `articles_v1_0_0` would be created after running `npm run schema`, given that the `version` in `package.json` is `1.0.0`.
 
+## Running migrations
+
+All index mappings are already the latest, so if you are starting a database with fresh data,
+there is no need for migrations.
+
+However, if you are reading data from a legacy version of mapping, you may need migrations.
+
+Migration scripts are put under `db/migrations`, which can be run as:
+
+```
+$ ./node_modules/.bin/babel-node db/migrations/<migration script name>
+```
+
 ## Prepare database for unit test
 
 See [rumors-api](https://github.com/cofacts/rumors-api)
