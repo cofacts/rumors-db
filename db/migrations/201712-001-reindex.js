@@ -10,8 +10,7 @@ const client = new elasticsearch.Client({
 });
 
 async function main() {
-
-  client.reindex({
+  await client.reindex({
     waitForCompletion: true,
     body: {
       source: { index: 'articles_legacy' },
@@ -29,14 +28,14 @@ async function main() {
           ctx._source.put('tags', new ArrayList());
           ctx._source.put('replyRequestCount', ctx._source.replyRequestIds.size());
 
-          ctx._source.put('app_id', ctx._source.from);
+          ctx._source.put('appId', ctx._source.from);
           ctx._source.remove('from');
         `,
       },
     },
   });
 
-  client.reindex({
+  await client.reindex({
     waitForCompletion: true,
     body: {
       source: { index: 'replies_legacy' },
@@ -54,7 +53,49 @@ async function main() {
           ctx._source.putAll(ctx._source.versions[0]);
           ctx._source.remove('versions');
 
-          ctx._source.put('app_id', ctx._source.from);
+          ctx._source.put('appId', ctx._source.from);
+          ctx._source.remove('from');
+        `,
+      },
+    },
+  });
+
+  await client.reindex({
+    waitForCompletion: true,
+    body: {
+      source: { index: 'replyconnectionfeedbacks_legacy' },
+      dest: {
+        index: getIndexName('articlereplyfeedbacks'),
+        type: 'doc',
+        op_type: 'create',
+      },
+      conflicts: 'proceed',
+      script: {
+        lang: 'painless',
+        source: `
+          ctx._source.remove('comment');
+
+          ctx._source.put('appId', ctx._source.from);
+          ctx._source.remove('from');
+        `,
+      },
+    },
+  });
+
+  await client.reindex({
+    waitForCompletion: true,
+    body: {
+      source: { index: 'replyrequests_legacy' },
+      dest: {
+        index: getIndexName('replyrequests'),
+        type: 'doc',
+        op_type: 'create',
+      },
+      conflicts: 'proceed',
+      script: {
+        lang: 'painless',
+        source: `
+          ctx._source.put('appId', ctx._source.from);
           ctx._source.remove('from');
         `,
       },
