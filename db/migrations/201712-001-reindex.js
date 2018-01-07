@@ -73,6 +73,12 @@ async function main() {
       script: {
         lang: 'painless',
         source: `
+          String[] tokens = /__/.split(ctx._id);
+          String articleId = tokens[0];
+          String replyId = tokens[1];
+
+          ctx._source.put('articleId', articleId);
+          ctx._source.put('replyId', replyId);
           ctx._source.remove('comment');
 
           ctx._source.put('appId', ctx._source.from);
@@ -95,6 +101,11 @@ async function main() {
       script: {
         lang: 'painless',
         source: `
+          String articleId = ctx._source.from.equals('RUMORS_LINE_BOT') ?
+            /__/.split(ctx._id)[0] :
+            ctx._id.replace('-replyRequest', '-rumor');
+
+          ctx._source.put('articleId', articleId);
           ctx._source.put('appId', ctx._source.from);
           ctx._source.remove('from');
         `,

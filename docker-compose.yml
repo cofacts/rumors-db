@@ -16,6 +16,7 @@ services:
       - "./esdata:/usr/share/elasticsearch/data"
     environment:
       - "path.repo=/usr/share/elasticsearch/data"
+      - "script.painless.regex.enabled=true"
     ports:
       - "62222:9200"
 
