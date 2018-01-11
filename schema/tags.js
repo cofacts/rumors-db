@@ -1,5 +1,4 @@
 export default {
-  _all: { enabled: false },
   properties: {
     title: { type: 'keyword' },
     description: { type: 'text', analyzer: 'cjk' },

@@ -1,5 +1,4 @@
 export default {
-  _all: { enabled: false },
   properties: {
     email: { type: 'keyword' },
     name: { type: 'keyword' },

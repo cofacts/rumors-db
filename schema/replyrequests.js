@@ -2,11 +2,10 @@
 // (articleId, userId, appId) should be unique throughout DB.
 //
 export default {
-  _all: { enabled: false },
-  _parent: {
-    type: 'articles',
-  },
   properties: {
+    // The article ID and user ID is used in calculating replyrequests' ID.
+    articleId: { type: 'keyword' },
+
     // Auth
     // only recognizable for within a client.
     //
