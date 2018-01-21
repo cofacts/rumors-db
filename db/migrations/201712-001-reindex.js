@@ -162,7 +162,12 @@ async function main() {
   // Collecting foreign keys from legacy docs
   //
 
+  const replyRequestMap = createIdToSourceMap(
+    await fetchAllDocs('replyrequests_legacy')
+  );
+
   const requestIdToArticleId = {};
+  const articleIdToLastRequest = {};
   const connectionIdToArticleId = {};
   (await fetchAllDocs('articles_legacy')).forEach(
     ({ _id, _source: { replyConnectionIds, replyRequestIds } }) => {
@@ -170,6 +175,13 @@ async function main() {
         connId => (connectionIdToArticleId[connId] = _id)
       );
       replyRequestIds.forEach(reqId => (requestIdToArticleId[reqId] = _id));
+      articleIdToLastRequest[_id] = replyRequestIds.reduce(
+        (lastDate, replyRequestId) => {
+          const { createdAt } = replyRequestMap[replyRequestId];
+          return lastDate > createdAt ? lastDate : createdAt;
+        },
+        '1900-01-01T00:00:00.000Z'
+      );
     }
   );
 
@@ -256,6 +268,8 @@ async function main() {
       },
     });
   });
+
+  Object.keys(articleIdToLastRequest).forEach(articleId => {
     operations.push({
       update: {
         _index: getIndexName('articles'),
@@ -264,7 +278,9 @@ async function main() {
       },
     });
     operations.push({
-      doc: { articleReplies: articleIdToConnections[articleId] },
+      doc: {
+        lastRequestedAt: articleIdToLastRequest[articleId],
+      },
     });
   });
 
