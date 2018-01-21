@@ -180,7 +180,7 @@ async function main() {
           const { createdAt } = replyRequestMap[replyRequestId];
           return lastDate > createdAt ? lastDate : createdAt;
         },
-        '1900-01-01T00:00:00.000Z'
+        new Date(0)
       );
     }
   );
