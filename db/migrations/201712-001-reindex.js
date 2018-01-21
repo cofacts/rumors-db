@@ -180,7 +180,7 @@ async function main() {
     }
   );
 
-  const articleIdToConnections = {};
+  const articleIdToArticleReplies = {};
   const feedbackIdToReplyId = {};
   const feedbackIdToArticleId = {};
   const replyMap = createIdToSourceMap(await fetchAllDocs('replies_legacy'));
@@ -208,11 +208,11 @@ async function main() {
         feedbackId => feedbackIdToScore[feedbackId]
       );
 
-      if (!articleIdToConnections[articleId]) {
-        articleIdToConnections[articleId] = [];
+      if (!articleIdToArticleReplies[articleId]) {
+        articleIdToArticleReplies[articleId] = [];
       }
 
-      articleIdToConnections[articleId].push({
+      articleIdToArticleReplies[articleId].push({
         replyId,
         userId,
         appId: from,
@@ -238,7 +238,24 @@ async function main() {
   //
 
   const operations = [];
-  Object.keys(articleIdToConnections).forEach(articleId => {
+  Object.keys(articleIdToArticleReplies).forEach(articleId => {
+    const articleReplies = articleIdToArticleReplies[articleId];
+    operations.push({
+      update: {
+        _index: getIndexName('articles'),
+        _type: 'doc',
+        _id: articleId,
+      },
+    });
+    operations.push({
+      doc: {
+        articleReplies,
+        normalArticleReplyCount: articleReplies.filter(
+          ({ status }) => status === 'NORMAL'
+        ).length,
+      },
+    });
+  });
     operations.push({
       update: {
         _index: getIndexName('articles'),
