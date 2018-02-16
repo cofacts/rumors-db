@@ -78,6 +78,7 @@ async function main() {
           ctx._source.put('articleReplies', new ArrayList());
           ctx._source.put('hyperlinks', new ArrayList());
           ctx._source.put('tags', new ArrayList());
+          ctx._source.put('normalArticleReplyCount', 0);
 
           ctx._source.put('replyRequestCount', ctx._source.replyRequestIds.size());
           ctx._source.remove('replyConnectionIds');
