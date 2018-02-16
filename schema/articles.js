@@ -51,6 +51,10 @@ export default {
       },
     },
 
+    // Cached counts of articleReplies with status = NORMAL.
+    // The length of nested objects cannot be used in filters...
+    normalArticleReplyCount: { type: 'long' },
+
     // Cached counter and timestamp from replyrequests
     replyRequestCount: { type: 'long' },
     lastRequestedAt: { type: 'date' },

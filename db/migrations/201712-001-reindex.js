@@ -162,7 +162,12 @@ async function main() {
   // Collecting foreign keys from legacy docs
   //
 
+  const replyRequestMap = createIdToSourceMap(
+    await fetchAllDocs('replyrequests_legacy')
+  );
+
   const requestIdToArticleId = {};
+  const articleIdToLastRequest = {};
   const connectionIdToArticleId = {};
   (await fetchAllDocs('articles_legacy')).forEach(
     ({ _id, _source: { replyConnectionIds, replyRequestIds } }) => {
@@ -170,6 +175,13 @@ async function main() {
         connId => (connectionIdToArticleId[connId] = _id)
       );
       replyRequestIds.forEach(reqId => (requestIdToArticleId[reqId] = _id));
+      articleIdToLastRequest[_id] = replyRequestIds.reduce(
+        (lastDate, replyRequestId) => {
+          const { createdAt } = replyRequestMap[replyRequestId];
+          return lastDate > createdAt ? lastDate : createdAt;
+        },
+        new Date(0)
+      );
     }
   );
 
@@ -180,7 +192,7 @@ async function main() {
     }
   );
 
-  const articleIdToConnections = {};
+  const articleIdToArticleReplies = {};
   const feedbackIdToReplyId = {};
   const feedbackIdToArticleId = {};
   const replyMap = createIdToSourceMap(await fetchAllDocs('replies_legacy'));
@@ -208,11 +220,11 @@ async function main() {
         feedbackId => feedbackIdToScore[feedbackId]
       );
 
-      if (!articleIdToConnections[articleId]) {
-        articleIdToConnections[articleId] = [];
+      if (!articleIdToArticleReplies[articleId]) {
+        articleIdToArticleReplies[articleId] = [];
       }
 
-      articleIdToConnections[articleId].push({
+      articleIdToArticleReplies[articleId].push({
         replyId,
         userId,
         appId: from,
@@ -238,7 +250,8 @@ async function main() {
   //
 
   const operations = [];
-  Object.keys(articleIdToConnections).forEach(articleId => {
+  Object.keys(articleIdToArticleReplies).forEach(articleId => {
+    const articleReplies = articleIdToArticleReplies[articleId];
     operations.push({
       update: {
         _index: getIndexName('articles'),
@@ -247,7 +260,27 @@ async function main() {
       },
     });
     operations.push({
-      doc: { articleReplies: articleIdToConnections[articleId] },
+      doc: {
+        articleReplies,
+        normalArticleReplyCount: articleReplies.filter(
+          ({ status }) => status === 'NORMAL'
+        ).length,
+      },
+    });
+  });
+
+  Object.keys(articleIdToLastRequest).forEach(articleId => {
+    operations.push({
+      update: {
+        _index: getIndexName('articles'),
+        _type: 'doc',
+        _id: articleId,
+      },
+    });
+    operations.push({
+      doc: {
+        lastRequestedAt: articleIdToLastRequest[articleId],
+      },
     });
   });
 
