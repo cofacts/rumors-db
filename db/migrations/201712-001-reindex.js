@@ -315,10 +315,14 @@ async function main() {
     });
   });
 
+  console.log('Bulk operation count', operations.length);
+
   const result = await quietClient.bulk({
     body: operations,
     refresh: true,
     _source: false,
+    timeout: '10m',
+    requestTimeout: 600000,
   });
   console.log(
     'Bulk operation done: ',
