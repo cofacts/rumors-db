@@ -159,6 +159,19 @@ async function main() {
     },
   });
 
+  await client.reindex({
+    waitForCompletion: true,
+    body: {
+      source: { index: 'users_legacy' },
+      dest: {
+        index: getIndexName('users'),
+        type: 'doc',
+        op_type: 'create',
+      },
+      conflicts: 'proceed',
+    },
+  });
+
   //
   // Collecting foreign keys from legacy docs
   //
