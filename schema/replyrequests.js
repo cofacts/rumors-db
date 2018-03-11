@@ -14,6 +14,27 @@ export default {
     // Should be one of backend APP ID, 'BOT_LEGACY', 'RUMORS_LINE_BOT' or 'WEBSITE'
     appId: { type: 'keyword' },
 
+    // Why the ReplyRequest is created
+    reason: { type: 'text', analyzer: 'cjk_url_email' },
+
+    // Editor's feedbacks for the reply request's reason
+    feedbacks: {
+      type: 'nested',
+      properties: {
+        // Auth
+        userId: { type: 'keyword' },
+        appId: { type: 'keyword' },
+
+        score: { type: 'byte' }, // 1, 0, -1
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
+      },
+    },
+
+    // Counter cache for feedbacks
+    positiveFeedbackCount: { type: 'long' },
+    negativeFeedbackCount: { type: 'long' },
+
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
   },
