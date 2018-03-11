@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint --fix .",
-    "lint:check": "eslint .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "json": "babel-node scripts/jsonToElasticSearch.js",
     "csv": "babel-node scripts/airtableCsvToJson.js `ls -r data/*.csv | head -n 1`",
     "schema": "babel-node db/loadSchema.js",
@@ -26,20 +26,20 @@
     "csv-parse": "^1.2.0",
     "csv-stringify": "^2.0.0",
     "elasticsearch": "^14.1.0",
-    "jest": "^18.1.0",
-    "moment": "^2.17.1",
-    "node-fetch": "^1.6.3",
+    "jest": "^22.4.2",
+    "moment": "^2.21.0",
+    "node-fetch": "^2.1.1",
     "progress": "^1.1.8",
     "sha1": "^1.1.1",
     "simhash": "https://github.com/authbox-lib/simhash.git",
     "string-similarity": "^1.1.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "eslint": "^3.19.0",
-    "eslint-config-prettier": "^1.7.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-prettier": "^2.0.1",
-    "prettier": "^1.3.0"
+    "babel-eslint": "^8.2.2",
+    "eslint": "^4.18.2",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "prettier": "^1.8.2"
   }
 }
