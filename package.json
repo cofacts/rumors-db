@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "dump": "babel-node scripts/dumpOpenData.js",
     "json": "babel-node scripts/jsonToElasticSearch.js",
     "csv": "babel-node scripts/airtableCsvToJson.js `ls -r data/*.csv | head -n 1`",
     "schema": "babel-node db/loadSchema.js",
