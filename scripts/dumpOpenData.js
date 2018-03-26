@@ -116,7 +116,6 @@ async function dumpReplies(replies) {
     'createdAt'
   ];
   let csvString = fields.join(',') + '\n';
-  console.log(replies[2]._source);
   replies.forEach(reply => {
     const body = reply._source;
     csvString += reply._id + ',';
@@ -130,13 +129,50 @@ async function dumpReplies(replies) {
   fs.writeFileSync('./opendata/replies.csv', csvString, 'utf8');
 }
 
+
+async function dumpReplyRequests(replyRequests) {
+  const fields = [
+    'articleId',
+    'createdAt'
+  ];
+  let csvString = fields.join(',') + '\n';
+  replyRequests.forEach(reply => {
+    const body = reply._source;
+    csvString += body.articleId + ',';
+    csvString += body.createdAt + '\n';
+  });
+  fs.writeFileSync('./opendata/reply_requests.csv', csvString, 'utf8');
+}
+
+async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
+  const fields = [
+    'articleId',
+    'replyId',
+    'score',
+    'createdAt'
+  ];
+  let csvString = fields.join(',') + '\n';
+  articleReplyFeedbacks.forEach(reply => {
+    const body = reply._source;
+    csvString += body.articleId + ',';
+    csvString += body.replyId + ',';
+    csvString += body.score + ',';
+    csvString += body.createdAt + '\n';
+  });
+  fs.writeFileSync('./opendata/article_reply_feedbacks.csv', csvString, 'utf8');
+}
+
 async function run() {
   const articles = await scanIndex('articles');
   const replies = await scanIndex('replies');
+  const replyRequests = await scanIndex('replyrequests');
+  const articleReplyFeedbacks = await scanIndex('articlereplyfeedbacks');
 
   dumpArticles(articles);
   dumpArticleReplies(articles);
   dumpReplies(replies);
+  dumpReplyRequests(replyRequests);
+  dumpArticleReplyFeedbacks(articleReplyFeedbacks);
 }
 
 run();
