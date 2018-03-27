@@ -28,6 +28,7 @@
     "csv-stringify": "^2.0.0",
     "elasticsearch": "^14.1.0",
     "jest": "^22.4.2",
+    "jszip": "^3.1.5",
     "moment": "^2.21.0",
     "node-fetch": "^2.1.1",
     "progress": "^1.1.8",

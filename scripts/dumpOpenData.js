@@ -1,10 +1,11 @@
+import '../util/catchUnhandledRejection';
+
+import fs from 'fs';
+import crypto from 'crypto';
 import elasticsearch from 'elasticsearch';
 import config from 'config';
 import csvStringify from 'csv-stringify';
-import crypto from 'crypto';
-
-import '../util/catchUnhandledRejection';
-import fs from 'fs';
+import JSZip from 'jszip';
 
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
@@ -67,8 +68,12 @@ async function scanIndex(index) {
   return result;
 }
 
-async function dumpArticles(articles) {
-  const csvString = await generateCSV([
+/**
+ * @param {object[]} articles
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticles(articles) {
+  return generateCSV([
     [
       'id',
       'references', // array of strings
@@ -96,11 +101,13 @@ async function dumpArticles(articles) {
       _source.lastRequestedAt,
     ]),
   ]);
-
-  fs.writeFileSync('./opendata/articles.csv', csvString, 'utf8');
 }
 
-async function dumpArticleReplies(articles) {
+/**
+ * @param {object[]} articles
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticleReplies(articles) {
   const csvInput = [
     [
       'articleId',
@@ -135,15 +142,15 @@ async function dumpArticleReplies(articles) {
     });
   });
 
-  fs.writeFileSync(
-    './opendata/article_replies.csv',
-    await generateCSV(csvInput),
-    'utf8'
-  );
+  return generateCSV(csvInput);
 }
 
+/**
+ * @param {object[]} replies
+ * @returns {Promise<string>} Generated CSV string
+ */
 async function dumpReplies(replies) {
-  const csvString = await generateCSV([
+  return generateCSV([
     ['id', 'type', 'reference', 'userIdsha256', 'appId', 'text', 'createdAt'],
     ...replies.map(({ _source, _id }) => [
       _id,
@@ -155,12 +162,14 @@ async function dumpReplies(replies) {
       _source.createdAt,
     ]),
   ]);
-
-  fs.writeFileSync('./opendata/replies.csv', csvString, 'utf8');
 }
 
-async function dumpReplyRequests(replyRequests) {
-  const csvString = await generateCSV([
+/**
+ * @param {object[]} replyRequests
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpReplyRequests(replyRequests) {
+  return generateCSV([
     ['articleId', 'userIdsha256', 'appId', 'createdAt'],
     ...replyRequests.map(({ _source }) => [
       _source.articleId,
@@ -169,11 +178,14 @@ async function dumpReplyRequests(replyRequests) {
       _source.createdAt,
     ]),
   ]);
-  fs.writeFileSync('./opendata/reply_requests.csv', csvString, 'utf8');
 }
 
-async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
-  const csvString = await generateCSV([
+/**
+ * @param {object[]} articleReplyFeedbacks
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
+  return generateCSV([
     ['articleId', 'replyId', 'score', 'userIdsha256', 'appId', 'createdAt'],
     ...articleReplyFeedbacks.map(({ _source }) => [
       _source.articleId,
@@ -184,20 +196,47 @@ async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
       _source.createdAt,
     ]),
   ]);
-  fs.writeFileSync('./opendata/article_reply_feedbacks.csv', csvString, 'utf8');
 }
 
-async function run() {
-  const articles = await scanIndex('articles');
-  const replies = await scanIndex('replies');
-  const replyRequests = await scanIndex('replyrequests');
-  const articleReplyFeedbacks = await scanIndex('articlereplyfeedbacks');
+/**
+ * @param {string} fileName The name of file to be put in a zip file
+ * @returns {({string}) => (none)}
+ */
+function writeFile(fileName) {
+  return data => {
+    const zip = new JSZip();
+    zip.file(fileName, data);
 
-  dumpArticles(articles);
-  dumpArticleReplies(articles);
-  dumpReplies(replies);
-  dumpReplyRequests(replyRequests);
-  dumpArticleReplyFeedbacks(articleReplyFeedbacks);
+    // Ref: https://stuk.github.io/jszip/documentation/howto/write_zip.html#in-nodejs
+    //
+    zip
+      .generateNodeStream({
+        type: 'nodebuffer',
+        streamFiles: true,
+        compression: 'DEFLATE',
+        compressionOptions: { level: 8 },
+      })
+      .pipe(fs.createWriteStream(`./opendata/${fileName}.zip`))
+      .on('finish', () => console.log(`${fileName} written.`));
+  };
 }
 
-run();
+/**
+ * Main process
+ */
+
+const articlePromise = scanIndex('articles');
+articlePromise.then(dumpArticles).then(writeFile('articles.csv'));
+articlePromise.then(dumpArticleReplies).then(writeFile('article_replies.csv'));
+
+scanIndex('replies')
+  .then(dumpReplies)
+  .then(writeFile('replies.csv'));
+
+scanIndex('replyrequests')
+  .then(dumpReplyRequests)
+  .then(writeFile('reply_requests.csv'));
+
+scanIndex('articlereplyfeedbacks')
+  .then(dumpArticleReplyFeedbacks)
+  .then(writeFile('article_reply_feedbacks.csv'));
