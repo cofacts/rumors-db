@@ -1,5 +1,6 @@
 import elasticsearch from 'elasticsearch';
 import config from 'config';
+import csvStringify from 'csv-stringify';
 
 import '../util/catchUnhandledRejection';
 import fs from 'fs';
@@ -8,6 +9,21 @@ const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
   log: 'info',
 });
+
+/**
+ * @param {any[][]} input
+ * @returns {Promise<string>} CSV content
+ */
+function generateCSV(input) {
+  return new Promise((resolve, reject) => {
+    csvStringify(input, (err, csvData) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(csvData);
+    });
+  });
+}
 
 async function scanIndex(index) {
   let result = [];
@@ -38,34 +54,35 @@ async function scanIndex(index) {
 }
 
 async function dumpArticles(articles) {
-  const fields = [
-    'id',
-    'references', // array of strings
-    'userId',
-    'tags', // array of strings
-    'normalArticleReplyCount',
-    'appId',
-    'text',
-    'hyperlinks',
-    'createdAt',
-    'updatedAt',
-    'lastRequestedAt',
-  ];
-  let csvString = fields.join(',') + '\n';
-  articles.forEach(article => {
-    csvString += article._id + ',';
-    const body = article._source;
-    csvString += body.references.map(ref => ref.type).join(',') + ',';
-    csvString += body.userId + ',';
-    csvString += body.tags.join(',') + ',';
-    csvString += body.normalArticleReplyCount + ',';
-    csvString += body.appId + ',';
-    csvString += '"' + body.text.replace(/"/g, '""') + '",'; // escape double quote in CSV format
-    csvString += '"' + (body.hyperlinks && body.hyperlinks.join(',')) + '",';
-    csvString += body.createdAt + ',';
-    csvString += body.updatedAt + ',';
-    csvString += body.lastRequestedAt + '\n';
-  });
+  const csvString = await generateCSV([
+    [
+      'id',
+      'references', // array of strings
+      'userId',
+      'tags', // array of strings
+      'normalArticleReplyCount',
+      'appId',
+      'text',
+      'hyperlinks',
+      'createdAt',
+      'updatedAt',
+      'lastRequestedAt',
+    ],
+    ...articles.map(({ _id, _source }) => [
+      _id,
+      _source.references.map(ref => ref.type).join(','),
+      _source.userId,
+      _source.tags.join(','),
+      _source.normalArticleReplyCount,
+      _source.appId,
+      _source.text,
+      (_source.hyperlinks || []).join(','),
+      _source.createdAt,
+      _source.updatedAt,
+      _source.lastRequestedAt,
+    ]),
+  ]);
+
   fs.writeFileSync('./opendata/articles.csv', csvString, 'utf8');
 }
 
@@ -158,10 +175,10 @@ async function run() {
   const articleReplyFeedbacks = await scanIndex('articlereplyfeedbacks');
 
   dumpArticles(articles);
-  dumpArticleReplies(articles);
-  dumpReplies(replies);
-  dumpReplyRequests(replyRequests);
-  dumpArticleReplyFeedbacks(articleReplyFeedbacks);
+  // dumpArticleReplies(articles);
+  // dumpReplies(replies);
+  // dumpReplyRequests(replyRequests);
+  // dumpArticleReplyFeedbacks(articleReplyFeedbacks);
 }
 
 run();
