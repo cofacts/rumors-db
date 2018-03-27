@@ -87,84 +87,85 @@ async function dumpArticles(articles) {
 }
 
 async function dumpArticleReplies(articles) {
-  const fields = [
-    'articleId',
-    'replyId',
-    'userId',
-    'negativeFeedbackCount',
-    'positiveFeedbackCount',
-    'replyType',
-    'appId',
-    'status',
-    'createdAt',
-    'updatedAt',
+  const csvInput = [
+    [
+      'articleId',
+      'replyId',
+      'userId',
+      'negativeFeedbackCount',
+      'positiveFeedbackCount',
+      'replyType',
+      'appId',
+      'status',
+      'createdAt',
+      'updatedAt',
+    ],
   ];
-  let csvString = fields.join(',') + '\n';
-  articles.forEach(article => {
-    if (article._source.articleReplies) {
-      article._source.articleReplies.forEach(reply => {
-        csvString += article._id + ',';
-        csvString += reply.replyId + ',';
-        csvString += reply.userId + ',';
-        csvString += reply.negativeFeedbackCount + ',';
-        csvString += reply.positiveFeedbackCount + ',';
-        csvString += reply.replyType + ',';
-        csvString += reply.appId + ',';
-        csvString += reply.status + ',';
-        csvString += reply.createdAt + ',';
-        csvString += reply.updatedAt + '\n';
-      });
-    }
+
+  articles.forEach(({ _source: { articleReplies }, _id }) => {
+    if (!articleReplies) return;
+
+    articleReplies.forEach(ar => {
+      csvInput.push([
+        _id,
+        ar.replyId,
+        ar.userId,
+        ar.negativeFeedbackCount,
+        ar.positiveFeedbackCount,
+        ar.replyType,
+        ar.appId,
+        ar.status,
+        ar.createdAt,
+        ar.updatedAt,
+      ]);
+    });
   });
-  fs.writeFileSync('./opendata/article_replies.csv', csvString, 'utf8');
+
+  fs.writeFileSync(
+    './opendata/article_replies.csv',
+    await generateCSV(csvInput),
+    'utf8'
+  );
 }
 
 async function dumpReplies(replies) {
-  const fields = [
-    'id',
-    'type',
-    'reference',
-    'userId',
-    'appId',
-    'text',
-    'createdAt',
-  ];
-  let csvString = fields.join(',') + '\n';
-  replies.forEach(reply => {
-    const body = reply._source;
-    csvString += reply._id + ',';
-    csvString += body.type + ',';
-    csvString +=
-      '"' + (body.reference && body.reference.replace(/"/g, '""')) + '",';
-    csvString += body.userId + ',';
-    csvString += body.appId + ',';
-    csvString += '"' + body.text.replace(/"/g, '""') + '",';
-    csvString += body.createdAt + '\n';
-  });
+  const csvString = await generateCSV([
+    ['id', 'type', 'reference', 'userId', 'appId', 'text', 'createdAt'],
+    ...replies.map(({ _source, _id }) => [
+      _id,
+      _source.type,
+      _source.reference,
+      _source.userId,
+      _source.appId,
+      _source.text,
+      _source.createdAt,
+    ]),
+  ]);
+
   fs.writeFileSync('./opendata/replies.csv', csvString, 'utf8');
 }
 
 async function dumpReplyRequests(replyRequests) {
-  const fields = ['articleId', 'createdAt'];
-  let csvString = fields.join(',') + '\n';
-  replyRequests.forEach(reply => {
-    const body = reply._source;
-    csvString += body.articleId + ',';
-    csvString += body.createdAt + '\n';
-  });
+  const csvString = await generateCSV([
+    ['articleId', 'createdAt'],
+    ...replyRequests.map(({ _source }) => [
+      _source.articleId,
+      _source.createdAt,
+    ]),
+  ]);
   fs.writeFileSync('./opendata/reply_requests.csv', csvString, 'utf8');
 }
 
 async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
-  const fields = ['articleId', 'replyId', 'score', 'createdAt'];
-  let csvString = fields.join(',') + '\n';
-  articleReplyFeedbacks.forEach(reply => {
-    const body = reply._source;
-    csvString += body.articleId + ',';
-    csvString += body.replyId + ',';
-    csvString += body.score + ',';
-    csvString += body.createdAt + '\n';
-  });
+  const csvString = await generateCSV([
+    ['articleId', 'replyId', 'score', 'createdAt'],
+    ...articleReplyFeedbacks.map(({ _source }) => [
+      _source.articleId,
+      _source.replyId,
+      _source.score,
+      _source.createdAt,
+    ]),
+  ]);
   fs.writeFileSync('./opendata/article_reply_feedbacks.csv', csvString, 'utf8');
 }
 
@@ -175,10 +176,10 @@ async function run() {
   const articleReplyFeedbacks = await scanIndex('articlereplyfeedbacks');
 
   dumpArticles(articles);
-  // dumpArticleReplies(articles);
-  // dumpReplies(replies);
-  // dumpReplyRequests(replyRequests);
-  // dumpArticleReplyFeedbacks(articleReplyFeedbacks);
+  dumpArticleReplies(articles);
+  dumpReplies(replies);
+  dumpReplyRequests(replyRequests);
+  dumpArticleReplyFeedbacks(articleReplyFeedbacks);
 }
 
 run();
