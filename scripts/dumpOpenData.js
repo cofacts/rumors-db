@@ -1,6 +1,7 @@
 import elasticsearch from 'elasticsearch';
 import config from 'config';
 import csvStringify from 'csv-stringify';
+import crypto from 'crypto';
 
 import '../util/catchUnhandledRejection';
 import fs from 'fs';
@@ -23,6 +24,19 @@ function generateCSV(input) {
       return resolve(csvData);
     });
   });
+}
+
+/**
+ * @param {string} input
+ * @returns {string} - input's sha256 hash hex string. Empty string if input is falsy.
+ */
+function sha256(input) {
+  return input
+    ? crypto
+        .createHash('sha256')
+        .update(input, 'utf8')
+        .digest('hex')
+    : '';
 }
 
 async function scanIndex(index) {
@@ -58,7 +72,7 @@ async function dumpArticles(articles) {
     [
       'id',
       'references', // array of strings
-      'userId',
+      'userIdsha256',
       'tags', // array of strings
       'normalArticleReplyCount',
       'appId',
@@ -71,7 +85,7 @@ async function dumpArticles(articles) {
     ...articles.map(({ _id, _source }) => [
       _id,
       _source.references.map(ref => ref.type).join(','),
-      _source.userId,
+      sha256(_source.userId),
       _source.tags.join(','),
       _source.normalArticleReplyCount,
       _source.appId,
@@ -91,7 +105,7 @@ async function dumpArticleReplies(articles) {
     [
       'articleId',
       'replyId',
-      'userId',
+      'userIdsha256',
       'negativeFeedbackCount',
       'positiveFeedbackCount',
       'replyType',
@@ -109,7 +123,7 @@ async function dumpArticleReplies(articles) {
       csvInput.push([
         _id,
         ar.replyId,
-        ar.userId,
+        sha256(ar.userId),
         ar.negativeFeedbackCount,
         ar.positiveFeedbackCount,
         ar.replyType,
@@ -130,12 +144,12 @@ async function dumpArticleReplies(articles) {
 
 async function dumpReplies(replies) {
   const csvString = await generateCSV([
-    ['id', 'type', 'reference', 'userId', 'appId', 'text', 'createdAt'],
+    ['id', 'type', 'reference', 'userIdsha256', 'appId', 'text', 'createdAt'],
     ...replies.map(({ _source, _id }) => [
       _id,
       _source.type,
       _source.reference,
-      _source.userId,
+      sha256(_source.userId),
       _source.appId,
       _source.text,
       _source.createdAt,
@@ -147,9 +161,11 @@ async function dumpReplies(replies) {
 
 async function dumpReplyRequests(replyRequests) {
   const csvString = await generateCSV([
-    ['articleId', 'createdAt'],
+    ['articleId', 'userIdsha256', 'appId', 'createdAt'],
     ...replyRequests.map(({ _source }) => [
       _source.articleId,
+      sha256(_source.userId),
+      _source.appId,
       _source.createdAt,
     ]),
   ]);
@@ -158,11 +174,13 @@ async function dumpReplyRequests(replyRequests) {
 
 async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
   const csvString = await generateCSV([
-    ['articleId', 'replyId', 'score', 'createdAt'],
+    ['articleId', 'replyId', 'score', 'userIdsha256', 'appId', 'createdAt'],
     ...articleReplyFeedbacks.map(({ _source }) => [
       _source.articleId,
       _source.replyId,
       _source.score,
+      sha256(_source.userId),
+      _source.appId,
       _source.createdAt,
     ]),
   ]);
