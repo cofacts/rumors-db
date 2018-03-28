@@ -1,13 +1,44 @@
+import '../util/catchUnhandledRejection';
+
+import fs from 'fs';
+import crypto from 'crypto';
 import elasticsearch from 'elasticsearch';
 import config from 'config';
-
-import '../util/catchUnhandledRejection';
-import fs from 'fs';
+import csvStringify from 'csv-stringify';
+import JSZip from 'jszip';
 
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
   log: 'info',
 });
+
+/**
+ * @param {any[][]} input
+ * @returns {Promise<string>} CSV content
+ */
+function generateCSV(input) {
+  return new Promise((resolve, reject) => {
+    csvStringify(input, (err, csvData) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(csvData);
+    });
+  });
+}
+
+/**
+ * @param {string} input
+ * @returns {string} - input's sha256 hash hex string. Empty string if input is falsy.
+ */
+function sha256(input) {
+  return input
+    ? crypto
+        .createHash('sha256')
+        .update(input, 'utf8')
+        .digest('hex')
+    : '';
+}
 
 async function scanIndex(index) {
   let result = [];
@@ -37,131 +68,175 @@ async function scanIndex(index) {
   return result;
 }
 
-async function dumpArticles(articles) {
-  const fields = [
-    'id',
-    'references', // array of strings
-    'userId',
-    'tags', // array of strings
-    'normalArticleReplyCount',
-    'appId',
-    'text',
-    'hyperlinks',
-    'createdAt',
-    'updatedAt',
-    'lastRequestedAt',
-  ];
-  let csvString = fields.join(',') + '\n';
-  articles.forEach(article => {
-    csvString += article._id + ',';
-    const body = article._source;
-    csvString += body.references.map(ref => ref.type).join(',') + ',';
-    csvString += body.userId + ',';
-    csvString += body.tags.join(',') + ',';
-    csvString += body.normalArticleReplyCount + ',';
-    csvString += body.appId + ',';
-    csvString += '"' + body.text.replace(/"/g, '""') + '",'; // escape double quote in CSV format
-    csvString += '"' + (body.hyperlinks && body.hyperlinks.join(',')) + '",';
-    csvString += body.createdAt + ',';
-    csvString += body.updatedAt + ',';
-    csvString += body.lastRequestedAt + '\n';
-  });
-  fs.writeFileSync('./opendata/articles.csv', csvString, 'utf8');
+/**
+ * @param {object[]} articles
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticles(articles) {
+  return generateCSV([
+    [
+      'id',
+      'references', // array of strings
+      'userIdsha256',
+      'tags', // array of strings
+      'normalArticleReplyCount',
+      'appId',
+      'text',
+      'hyperlinks',
+      'createdAt',
+      'updatedAt',
+      'lastRequestedAt',
+    ],
+    ...articles.map(({ _id, _source }) => [
+      _id,
+      _source.references.map(ref => ref.type).join(','),
+      sha256(_source.userId),
+      _source.tags.join(','),
+      _source.normalArticleReplyCount,
+      _source.appId,
+      _source.text,
+      (_source.hyperlinks || []).join(','),
+      _source.createdAt,
+      _source.updatedAt,
+      _source.lastRequestedAt,
+    ]),
+  ]);
 }
 
-async function dumpArticleReplies(articles) {
-  const fields = [
-    'articleId',
-    'replyId',
-    'userId',
-    'negativeFeedbackCount',
-    'positiveFeedbackCount',
-    'replyType',
-    'appId',
-    'status',
-    'createdAt',
-    'updatedAt',
+/**
+ * @param {object[]} articles
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticleReplies(articles) {
+  const csvInput = [
+    [
+      'articleId',
+      'replyId',
+      'userIdsha256',
+      'negativeFeedbackCount',
+      'positiveFeedbackCount',
+      'replyType',
+      'appId',
+      'status',
+      'createdAt',
+      'updatedAt',
+    ],
   ];
-  let csvString = fields.join(',') + '\n';
-  articles.forEach(article => {
-    if (article._source.articleReplies) {
-      article._source.articleReplies.forEach(reply => {
-        csvString += article._id + ',';
-        csvString += reply.replyId + ',';
-        csvString += reply.userId + ',';
-        csvString += reply.negativeFeedbackCount + ',';
-        csvString += reply.positiveFeedbackCount + ',';
-        csvString += reply.replyType + ',';
-        csvString += reply.appId + ',';
-        csvString += reply.status + ',';
-        csvString += reply.createdAt + ',';
-        csvString += reply.updatedAt + '\n';
-      });
-    }
+
+  articles.forEach(({ _source: { articleReplies }, _id }) => {
+    if (!articleReplies) return;
+
+    articleReplies.forEach(ar => {
+      csvInput.push([
+        _id,
+        ar.replyId,
+        sha256(ar.userId),
+        ar.negativeFeedbackCount,
+        ar.positiveFeedbackCount,
+        ar.replyType,
+        ar.appId,
+        ar.status,
+        ar.createdAt,
+        ar.updatedAt,
+      ]);
+    });
   });
-  fs.writeFileSync('./opendata/article_replies.csv', csvString, 'utf8');
+
+  return generateCSV(csvInput);
 }
 
+/**
+ * @param {object[]} replies
+ * @returns {Promise<string>} Generated CSV string
+ */
 async function dumpReplies(replies) {
-  const fields = [
-    'id',
-    'type',
-    'reference',
-    'userId',
-    'appId',
-    'text',
-    'createdAt',
-  ];
-  let csvString = fields.join(',') + '\n';
-  replies.forEach(reply => {
-    const body = reply._source;
-    csvString += reply._id + ',';
-    csvString += body.type + ',';
-    csvString +=
-      '"' + (body.reference && body.reference.replace(/"/g, '""')) + '",';
-    csvString += body.userId + ',';
-    csvString += body.appId + ',';
-    csvString += '"' + body.text.replace(/"/g, '""') + '",';
-    csvString += body.createdAt + '\n';
-  });
-  fs.writeFileSync('./opendata/replies.csv', csvString, 'utf8');
+  return generateCSV([
+    ['id', 'type', 'reference', 'userIdsha256', 'appId', 'text', 'createdAt'],
+    ...replies.map(({ _source, _id }) => [
+      _id,
+      _source.type,
+      _source.reference,
+      sha256(_source.userId),
+      _source.appId,
+      _source.text,
+      _source.createdAt,
+    ]),
+  ]);
 }
 
-async function dumpReplyRequests(replyRequests) {
-  const fields = ['articleId', 'createdAt'];
-  let csvString = fields.join(',') + '\n';
-  replyRequests.forEach(reply => {
-    const body = reply._source;
-    csvString += body.articleId + ',';
-    csvString += body.createdAt + '\n';
-  });
-  fs.writeFileSync('./opendata/reply_requests.csv', csvString, 'utf8');
+/**
+ * @param {object[]} replyRequests
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpReplyRequests(replyRequests) {
+  return generateCSV([
+    ['articleId', 'userIdsha256', 'appId', 'createdAt'],
+    ...replyRequests.map(({ _source }) => [
+      _source.articleId,
+      sha256(_source.userId),
+      _source.appId,
+      _source.createdAt,
+    ]),
+  ]);
 }
 
-async function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
-  const fields = ['articleId', 'replyId', 'score', 'createdAt'];
-  let csvString = fields.join(',') + '\n';
-  articleReplyFeedbacks.forEach(reply => {
-    const body = reply._source;
-    csvString += body.articleId + ',';
-    csvString += body.replyId + ',';
-    csvString += body.score + ',';
-    csvString += body.createdAt + '\n';
-  });
-  fs.writeFileSync('./opendata/article_reply_feedbacks.csv', csvString, 'utf8');
+/**
+ * @param {object[]} articleReplyFeedbacks
+ * @returns {Promise<string>} Generated CSV string
+ */
+function dumpArticleReplyFeedbacks(articleReplyFeedbacks) {
+  return generateCSV([
+    ['articleId', 'replyId', 'score', 'userIdsha256', 'appId', 'createdAt'],
+    ...articleReplyFeedbacks.map(({ _source }) => [
+      _source.articleId,
+      _source.replyId,
+      _source.score,
+      sha256(_source.userId),
+      _source.appId,
+      _source.createdAt,
+    ]),
+  ]);
 }
 
-async function run() {
-  const articles = await scanIndex('articles');
-  const replies = await scanIndex('replies');
-  const replyRequests = await scanIndex('replyrequests');
-  const articleReplyFeedbacks = await scanIndex('articlereplyfeedbacks');
+/**
+ * @param {string} fileName The name of file to be put in a zip file
+ * @returns {({string}) => (none)}
+ */
+function writeFile(fileName) {
+  return data => {
+    const zip = new JSZip();
+    zip.file(fileName, data);
 
-  dumpArticles(articles);
-  dumpArticleReplies(articles);
-  dumpReplies(replies);
-  dumpReplyRequests(replyRequests);
-  dumpArticleReplyFeedbacks(articleReplyFeedbacks);
+    // Ref: https://stuk.github.io/jszip/documentation/howto/write_zip.html#in-nodejs
+    //
+    zip
+      .generateNodeStream({
+        type: 'nodebuffer',
+        streamFiles: true,
+        compression: 'DEFLATE',
+        compressionOptions: { level: 8 },
+      })
+      .pipe(fs.createWriteStream(`./opendata/${fileName}.zip`))
+      .on('finish', () => console.log(`${fileName} written.`));
+  };
 }
 
-run();
+/**
+ * Main process
+ */
+
+const articlePromise = scanIndex('articles');
+articlePromise.then(dumpArticles).then(writeFile('articles.csv'));
+articlePromise.then(dumpArticleReplies).then(writeFile('article_replies.csv'));
+
+scanIndex('replies')
+  .then(dumpReplies)
+  .then(writeFile('replies.csv'));
+
+scanIndex('replyrequests')
+  .then(dumpReplyRequests)
+  .then(writeFile('reply_requests.csv'));
+
+scanIndex('articlereplyfeedbacks')
+  .then(dumpArticleReplyFeedbacks)
+  .then(writeFile('article_reply_feedbacks.csv'));
