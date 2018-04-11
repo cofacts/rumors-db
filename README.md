@@ -99,6 +99,9 @@ sample rumors & answers.
 
 These commands are invoked by commands mentioned above. See `package.json` for details.
 
+### `npm run dump`
+Dumps open data to `opendata/`
+
 ### `npm run clear`
 
 Deletes all indices.
