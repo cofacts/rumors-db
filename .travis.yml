@@ -2,5 +2,20 @@ language: node_js
 
 node_js: '8'
 
+services:
+  - docker
+
+before_install:
+  # Startup test db
+  #
+  - docker run -d -p "62223:9200" --name rumors-test-db docker.elastic.co/elasticsearch/elasticsearch:6.1.0
+  - sleep 10 # wait for elasticsearch
+
 script:
   - npm run lint
+  - npm run clear # Test if clear script works
+  - npm run schema # Test if schema can be applied
+
+after_script:
+  - docker stop rumors-test-db
+  - docker rm rumors-test-db
