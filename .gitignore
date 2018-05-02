@@ -1,4 +1,2 @@
 config/local-*.js
 node_modules
-*.log
-esdata
