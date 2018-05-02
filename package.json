@@ -8,33 +8,18 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "dump": "babel-node scripts/dumpOpenData.js",
-    "json": "babel-node scripts/jsonToElasticSearch.js",
-    "csv": "babel-node scripts/airtableCsvToJson.js `ls -r data/*.csv | head -n 1`",
     "schema": "babel-node db/loadSchema.js",
     "clear": "babel-node db/clear.js",
-    "seed": "npm run clear && npm run schema && npm run json -- `ls -r data/*.json | head -n 1`",
-    "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
-    "jest": "jest scripts/*.test.js",
-    "evaluate": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema && NODE_ENV=test npm run json -- data/20170119-0010.json",
-    "stats": "babel-node stats"
+    "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.1.8",
     "babel-preset-stage-3": "^6.17.0",
     "config": "^1.24.0",
-    "csv": "^3.0.0",
-    "csv-parse": "^2.0.0",
     "csv-stringify": "^3.0.0",
     "elasticsearch": "^14.1.0",
-    "jest": "^22.4.2",
-    "jszip": "^3.1.5",
-    "moment": "^2.21.0",
-    "node-fetch": "^2.1.1",
-    "progress": "^2.0.0",
-    "sha1": "^1.1.1",
-    "simhash": "https://github.com/authbox-lib/simhash.git",
-    "string-similarity": "^1.1.0"
+    "jszip": "^3.1.5"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

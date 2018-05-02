@@ -17,9 +17,9 @@ services:
     environment:
       - "path.repo=/usr/share/elasticsearch/data"
     ports:
-      - "62222:9200"
+      - "62223:9200"
 
   kibana:
     image: docker.elastic.co/kibana/kibana:6.1.0
     ports:
-      - "62223:5601"
+      - "62224:5601"

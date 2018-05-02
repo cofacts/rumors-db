@@ -1,5 +1,5 @@
 module.exports = {
   // elasticsearch setup
   //
-  ELASTICSEARCH_URL: 'http://localhost:62222',
+  ELASTICSEARCH_URL: 'http://localhost:62223',
 };
