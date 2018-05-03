@@ -7,5 +7,15 @@ export default {
     text: { type: 'text', analyzer: 'cjk_url_email' },
     reference: { type: 'text' },
     createdAt: { type: 'date' },
+
+    // Links in the text & reference
+    hyperlinks: {
+      type: 'nested',
+      properties: {
+        url: { type: 'keyword' }, // exact URL found in the articles
+        title: { type: 'text', analyzer: 'cjk' },
+        summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
+      },
+    },
   },
 };

@@ -60,5 +60,15 @@ export default {
     lastRequestedAt: { type: 'date' },
 
     tags: { type: 'keyword' },
+
+    // Links in article text
+    hyperlinks: {
+      type: 'nested',
+      properties: {
+        url: { type: 'keyword' }, // exact URL found in the articles
+        title: { type: 'text', analyzer: 'cjk' },
+        summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
+      },
+    },
   },
 };
