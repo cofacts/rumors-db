@@ -57,6 +57,19 @@ $ docker-compose up
 This spins up elasticsearch on `localhost:62223`, with Kibana available in `localhost:62224`, using
 the data in `esdata`.
 
+## Updating schema
+
+After adding fields / removing fields from indices, you will need to reload schema because
+elasticsearch mappings are not editable for opened indices.
+
+This can be done by:
+
+1. Manually bumping the schema version in package.json
+2. Run `npm run reload`
+
+The `npm run reload` would create indices with latest schema & package.json version postfix,
+perform reindex, modifies alias and removes all old indices.
+
 ---
 
 ## Other commands
