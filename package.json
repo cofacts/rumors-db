@@ -1,6 +1,6 @@
 {
   "name": "rumors-db",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cofacts Database schema & scripts",
   "main": "index.js",
   "license": "MIT",
@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "schema": "babel-node db/loadSchema.js",
+    "reload": "babel-node db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
