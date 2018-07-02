@@ -17,6 +17,9 @@ const aliasNames = Object.keys(schema);
 
 let aliasToOldIndexMap = {};
 
+/**
+ * @returns {Promise<undefined>}
+ */
 async function populateOldIndexMap() {
   // Returns:
   // { replies_v1_0_0: { aliases: { replies: {} } },
@@ -59,7 +62,7 @@ async function populateOldIndexMap() {
 }
 
 /**
- * @returns <Promise>
+ * @returns {Promise<object[]>}
  */
 function createNewIndexes() {
   return Promise.all(
@@ -92,6 +95,9 @@ function createNewIndexes() {
   );
 }
 
+/**
+ * @returns {Promise<object[]>}
+ */
 function reindexExistingIndexes() {
   return Promise.all(
     aliasNames.map(alias => {
@@ -118,8 +124,10 @@ function reindexExistingIndexes() {
  * Switch alias to new index and remove old indexes in one go.
  *
  * Reference: https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-aliases.html
+ *
+ * @returns {Promise<object>}
  */
-async function switchAndRemoveAllAliases() {
+function switchAndRemoveAllAliases() {
   const actions = aliasNames.reduce((actions, alias) => {
     const newActions = [
       {
@@ -135,9 +143,12 @@ async function switchAndRemoveAllAliases() {
     return actions.concat(newActions);
   }, []);
 
-  client.indices.updateAliases({ body: { actions } });
+  return client.indices.updateAliases({ body: { actions } });
 }
 
+/**
+ * Main script
+ */
 Promise.resolve()
   .then(populateOldIndexMap)
   .then(createNewIndexes)
