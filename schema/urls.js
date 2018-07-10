@@ -11,5 +11,6 @@ export default {
     topImageUrl: { type: 'keyword' }, // Image URL for preview
 
     fetchedAt: { type: 'date' },
+    status: { type: 'short' }, // status code of the response
   },
 };
