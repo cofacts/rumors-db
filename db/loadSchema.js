@@ -4,6 +4,7 @@ import config from 'config';
 import elasticsearch from 'elasticsearch';
 import '../util/catchUnhandledRejection';
 import getIndexName from '../util/getIndexName';
+import indexSetting from '../util/indexSetting';
 
 import * as schema from '../schema';
 
@@ -19,30 +20,7 @@ Object.keys(schema).forEach(index => {
     .create({
       index: indexName,
       body: {
-        settings: {
-          number_of_shards: 1,
-          index: {
-            analysis: {
-              filter: {
-                english_stop: {
-                  type: 'stop',
-                  stopwords: '_english_',
-                },
-              },
-              analyzer: {
-                cjk_url_email: {
-                  tokenizer: 'uax_url_email',
-                  filter: [
-                    'cjk_width',
-                    'lowercase',
-                    'cjk_bigram',
-                    'english_stop',
-                  ],
-                },
-              },
-            },
-          },
-        },
+        settings: indexSetting,
         mappings: { doc: schema[index] },
         aliases: {
           [index]: {},
