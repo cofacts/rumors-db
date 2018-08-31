@@ -11,6 +11,8 @@ export default {
     appId: { type: 'keyword' },
 
     score: { type: 'byte' }, // 1, 0, -1
+    comment: { type: 'text', analyzer: 'cjk_url_email' }, // user comment for the article reply
+
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
   },
