@@ -8,7 +8,9 @@ export default {
     // We disables html's indexing and doc_values because html would be super long and cause
     // "DocValuesField is too large" error when indexed or sorted.
 
-    topImageUrl: { type: 'keyword' }, // Image URL for preview
+    topImageUrl: { type: 'keyword', index: false, doc_values: false }, // Image URL for preview
+    // We disables topImageUrls's indexing and doc_values because it could be base64 string,
+    // which can be too long to be indexed or sorted.
 
     fetchedAt: { type: 'date' },
     status: { type: 'short' }, // status code of the response
