@@ -11,6 +11,7 @@ import * as schema from '../schema';
 const client = new elasticsearch.Client({
   host: config.get('ELASTICSEARCH_URL'),
   log: 'trace',
+  requestTimeout: 300000, // 5 min
 });
 
 const aliasNames = Object.keys(schema);
