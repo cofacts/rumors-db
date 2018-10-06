@@ -1,9 +1,9 @@
-import config from 'config';
-import elasticsearch from 'elasticsearch';
+import 'dotenv/config';
 import '../util/catchUnhandledRejection';
+import elasticsearch from 'elasticsearch';
 
 const client = new elasticsearch.Client({
-  host: config.get('ELASTICSEARCH_URL'),
+  host: process.env.ELASTICSEARCH_URL,
   log: 'trace',
 });
 
