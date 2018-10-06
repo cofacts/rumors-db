@@ -10,6 +10,7 @@
     "schema": "babel-node db/loadSchema.js",
     "reload": "babel-node db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
+    "seed": "babel-node db/loadSeed.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
