@@ -83,3 +83,7 @@ Deletes all indices.
 ### `npm run schema`
 
 Creates indices with specified mappings.
+
+### `npm run seed`
+
+Inserts seed (defined in `db/loadSeed.js`) into the database

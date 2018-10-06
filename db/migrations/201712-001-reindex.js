@@ -1,15 +1,15 @@
+import 'dotenv/config';
 import '../../util/catchUnhandledRejection';
-import config from 'config';
 import elasticsearch from 'elasticsearch';
 
 import getIndexName from '../../util/getIndexName';
 
 const client = new elasticsearch.Client({
-  host: config.get('ELASTICSEARCH_URL'),
+  host: process.env.ELASTICSEARCH_URL,
   log: 'trace',
 });
 const quietClient = new elasticsearch.Client({
-  host: config.get('ELASTICSEARCH_URL'),
+  host: process.env.ELASTICSEARCH_URL,
 });
 
 /**

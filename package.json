@@ -10,13 +10,14 @@
     "schema": "babel-node db/loadSchema.js",
     "reload": "babel-node db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
+    "seed": "babel-node db/loadSeed.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
     "babel-cli": "^6.18.0",
     "babel-preset-env": "^1.1.8",
     "babel-preset-stage-3": "^6.17.0",
-    "config": "^1.24.0",
+    "dotenv": "^6.0.0",
     "elasticsearch": "^15.0.0"
   },
   "devDependencies": {
