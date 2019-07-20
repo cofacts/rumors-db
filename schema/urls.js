@@ -15,5 +15,7 @@ export default {
     fetchedAt: { type: 'date' },
     status: { type: 'short' }, // status code of the response
     error: { type: 'keyword' }, // error returned by cofacts-url-resolver
+
+    isReferenced: { type: 'boolean' }, // rumors-api cleanupUrls.js script flag field
   },
 };
