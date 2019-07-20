@@ -66,6 +66,7 @@ export default {
       type: 'nested',
       properties: {
         url: { type: 'keyword' }, // exact URL found in the articles
+        normalizedUrl: { type: 'keyword' }, // URL after normalization (stored in urls)
         title: { type: 'text', analyzer: 'cjk' },
         summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
       },
