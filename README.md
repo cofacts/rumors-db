@@ -5,7 +5,7 @@ Scripts for managing rumors db
 
 ## Installation
 
-Please first install Node.JS 8.
+Please first install Node.JS 12.
 
 ```
 $ npm i
