@@ -54,12 +54,11 @@ export default {
     // Cached counts of articleReplies with status = NORMAL.
     // The length of nested objects cannot be used in filters...
     normalArticleReplyCount: { type: 'long' },
+    normalArticleCategoryCount: { type: 'long' },
 
     // Cached counter and timestamp from replyrequests
     replyRequestCount: { type: 'long' },
     lastRequestedAt: { type: 'date' },
-
-    tags: { type: 'keyword' },
 
     // Links in article text
     hyperlinks: {
@@ -69,6 +68,31 @@ export default {
         normalizedUrl: { type: 'keyword' }, // URL after normalization (stored in urls)
         title: { type: 'text', analyzer: 'cjk' },
         summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
+      },
+    },
+
+    articleCategories: {
+      type: 'nested',
+      properties: {
+        // Who created the category
+        // Empty if the category is added by AI
+        userId: { type: 'keyword' },
+        appId: { type: 'keyword' },
+
+        // exists only for AI tags
+        aiModel: { type: 'keyword' },
+        aiConfidence: { type: 'double' },
+
+        // Counter cache for feedbacks
+        positiveFeedbackCount: { type: 'long' },
+        negativeFeedbackCount: { type: 'long' },
+
+        // Foreign key
+        categoryId: { type: 'keyword' },
+
+        status: { type: 'keyword' }, // NORMAL, DELETED
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
       },
     },
   },
