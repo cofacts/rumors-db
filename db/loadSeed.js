@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import '../util/catchUnhandledRejection';
-import elasticsearch from 'elasticsearch';
+import elasticsearch from '@elastic/elasticsearch';
 
 const SEEDS = {
   '/articles/listArticleTest1': {
@@ -64,8 +64,7 @@ const SEEDS = {
 };
 
 const client = new elasticsearch.Client({
-  host: process.env.ELASTICSEARCH_URL,
-  log: 'debug',
+  node: process.env.ELASTICSEARCH_URL,
 });
 
 async function loadSeeds(seedMap) {

@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import '../util/catchUnhandledRejection';
-import elasticsearch from 'elasticsearch';
+import elasticsearch from '@elastic/elasticsearch';
 
 const client = new elasticsearch.Client({
-  host: process.env.ELASTICSEARCH_URL,
-  log: 'trace',
+  node: process.env.ELASTICSEARCH_URL,
 });
 
 client.indices.delete({ index: '_all' }).then(() => {

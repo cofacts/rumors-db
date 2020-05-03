@@ -1,15 +1,11 @@
 import 'dotenv/config';
 import '../../util/catchUnhandledRejection';
-import elasticsearch from 'elasticsearch';
+import elasticsearch from '@elastic/elasticsearch';
 
 import getIndexName from '../../util/getIndexName';
 
 const client = new elasticsearch.Client({
-  host: process.env.ELASTICSEARCH_URL,
-  log: 'trace',
-});
-const quietClient = new elasticsearch.Client({
-  host: process.env.ELASTICSEARCH_URL,
+  node: process.env.ELASTICSEARCH_URL,
 });
 
 /**
@@ -23,7 +19,7 @@ async function fetchAllDocs(indexName) {
     docs = [],
     total = Infinity;
 
-  const { hits, _scroll_id } = await quietClient.search({
+  const { hits, _scroll_id } = await client.search({
     index: indexName,
     scroll: '5s',
     size: 1000,
@@ -38,7 +34,7 @@ async function fetchAllDocs(indexName) {
   scrollId = _scroll_id;
 
   while (docs.length < total) {
-    const { hits, _scroll_id } = await quietClient.scroll({
+    const { hits, _scroll_id } = await client.scroll({
       scroll: '5s',
       scrollId,
     });
@@ -331,7 +327,7 @@ async function main() {
 
   console.log('Bulk operation count', operations.length);
 
-  const result = await quietClient.bulk({
+  const result = await client.bulk({
     body: operations,
     refresh: true,
     _source: false,
