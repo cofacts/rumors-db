@@ -24,7 +24,9 @@ async function populateOldIndexMap() {
   // { replies_v1_0_0: { aliases: { replies: {} } },
   //   articles_v1_0_0: { aliases: { articles: {} } }, ... }
 
-  const { error, status, ...currentIndexAliasMappings } = await client.indices
+  const {
+    body: { error, status, ...currentIndexAliasMappings },
+  } = await client.indices
     .getAlias({
       name: aliasNames,
       ignoreUnavailable: true, // some aliasNames may be new

@@ -77,7 +77,7 @@ async function loadSeeds(seedMap) {
     indexes.add(_index);
   });
 
-  const result = await client.bulk({ body, refresh: 'true' });
+  const { body: result } = await client.bulk({ body, refresh: 'true' });
   if (result.errors) {
     throw new Error(`Seed load failed : ${JSON.stringify(result, null, '  ')}`);
   }
