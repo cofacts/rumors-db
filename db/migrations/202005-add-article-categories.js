@@ -27,12 +27,15 @@ async function addArticleCategory() {
           source: `
             if (ctx._source.articleCategories === null) {
               ctx._source.articleCategories = new ArrayList();
+            } else {
+              ctx.op = 'noop';
             }
           `,
         },
       },
     })
-    .catch(e => console.error(e));
+    .then(resp => console.log(resp))
+    .catch(e => console.error(JSON.stringify(e, null, '  ')));
 }
 
 async function main() {
