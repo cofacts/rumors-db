@@ -4,13 +4,13 @@ export default {
     adminUserId: { type: 'keyword' },
     title: { type: 'text' }, // User-readable name for the app
     description: { type: 'text', analyzer: 'cjk' }, // intro for the app
+    createdAt: { type: 'date' },
+    updatedAt: { type: 'date' },
 
-    secret: { type: 'keyword' }, // for backend apps
+    // for backend apps
+    secret: { type: 'keyword' },
 
     // for browser apps
     corsOrigins: { type: 'keyword' }, // can have multiple
-
-    createdAt: { type: 'date' },
-    updatedAt: { type: 'date' },
   },
 };
