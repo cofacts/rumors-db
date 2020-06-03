@@ -1,7 +1,15 @@
 export default {
   properties: {
     name: { type: 'keyword' },
-    avatarUrl: { type: 'keyword' },
+    avatar: {
+      properties: {
+        type: { type: 'keyword' }, // url, gravatar, avataaars, openpeeps
+        props: {
+          // Allow arbitrary data for different avatar types
+          enabled: false,
+        },
+      },
+    },
 
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
