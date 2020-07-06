@@ -11,6 +11,11 @@ Please first install Node.JS 12.
 $ npm i
 ```
 
+## Configuration
+
+For development, copy `.env.sample` to `.env` and make necessary changes.
+
+
 ## Index mapping versions
 
 All mappings exist in `schema/` directory, with `schema/index.js` being the entry point.
