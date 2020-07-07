@@ -19,6 +19,6 @@ export default {
     },
 
     // either article or reply
-    type: { type: 'keyword' }
-  }
+    type: { type: 'keyword' },
+  },
 };
