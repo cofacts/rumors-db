@@ -21,6 +21,6 @@ export default {
     // either article or reply
     type: { type: 'keyword' },
 
-    docUserId: { type: 'keywork' },
+    docUserId: { type: 'keyword' },
   },
 };
