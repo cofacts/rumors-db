@@ -11,11 +11,10 @@ const client = new elasticsearch.Client({
   node: process.env.ELASTICSEARCH_URL,
 });
 
-Object.keys(schema).forEach(index => {
-  const indexName = getIndexName(index);
-
-  client.indices
-    .create({
+async function loadSchema() {
+  for (const index of Object.keys(schema)) {
+    const indexName = getIndexName(index);
+    await client.indices.create({
       index: indexName,
       body: {
         settings: indexSetting,
@@ -24,8 +23,12 @@ Object.keys(schema).forEach(index => {
           [index]: {},
         },
       },
-    })
-    .then(() => {
-      console.log(`Index "${index}" created with mappings`);
     });
+    console.log(`Index "${index}" created with mappings`);
+  }
+}
+
+loadSchema().catch(e => {
+  console.error(e);
+  process.exit(1);
 });
