@@ -25,7 +25,7 @@ async function loadSchema() {
           },
         },
       });
-    } catch(e) {
+    } catch (e) {
       console.error(`Error creating index "${index}"`, e);
       throw e;
     }
