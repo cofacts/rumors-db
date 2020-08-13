@@ -14,21 +14,25 @@ const client = new elasticsearch.Client({
 async function loadSchema() {
   for (const index of Object.keys(schema)) {
     const indexName = getIndexName(index);
-    await client.indices.create({
-      index: indexName,
-      body: {
-        settings: indexSetting,
-        mappings: { doc: schema[index] },
-        aliases: {
-          [index]: {},
+    try {
+      await client.indices.create({
+        index: indexName,
+        body: {
+          settings: indexSetting,
+          mappings: { doc: schema[index] },
+          aliases: {
+            [index]: {},
+          },
         },
-      },
-    });
+      });
+    } catch(e) {
+      console.error(`Error creating index "${index}"`, e);
+      throw e;
+    }
     console.log(`Index "${index}" created with mappings`);
   }
 }
 
 loadSchema().catch(e => {
-  console.error(e);
   process.exit(1);
 });
