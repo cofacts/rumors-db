@@ -33,6 +33,6 @@ async function loadSchema() {
   }
 }
 
-loadSchema().catch(e => {
+loadSchema().catch(() => {
   process.exit(1);
 });
