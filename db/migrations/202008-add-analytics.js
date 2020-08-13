@@ -17,7 +17,7 @@ const client = new elasticsearch.Client({
 });
 
 /**
- * Add new indices categories and articlecategoryfeedbacks
+ * Add new indices analytics
  */
 async function addNewIndices() {
   const schemas = { analytics };
