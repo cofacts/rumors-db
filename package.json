@@ -11,6 +11,7 @@
     "reload": "babel-node db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
     "seed": "babel-node db/loadSeed.js",
+    "backup": "babel-node db/backup.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
   "dependencies": {
