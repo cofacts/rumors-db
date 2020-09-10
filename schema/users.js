@@ -6,8 +6,9 @@ export default {
 
     avatarType: { type: 'keyword' }, // url, gravatar, openpeeps
     avatarData: {
-      type: 'text',
+      type: 'keyword',
       index: false,
+      doc_values: false,
     }, // could be url or json props for openpeeps
 
     appId: { type: 'keyword' },
