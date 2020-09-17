@@ -20,7 +20,7 @@ export default {
 
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
-    
+
     // Timestamp for the last time the user performed a rumors-api API call
     lastActiveAt: { type: 'date' },
   },
