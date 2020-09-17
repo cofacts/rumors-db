@@ -22,5 +22,6 @@ export default {
     type: { type: 'keyword' },
 
     docUserId: { type: 'keyword' },
+    docAppId: { type: 'keyword' },
   },
 };
