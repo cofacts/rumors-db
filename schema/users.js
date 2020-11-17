@@ -3,6 +3,8 @@ export default {
     email: { type: 'keyword' },
     name: { type: 'keyword' },
     avatarUrl: { type: 'keyword' },
+    slug: { type: 'keyword' },
+    bio: { type: 'text' },
 
     avatarType: { type: 'keyword' }, // url, gravatar, openpeeps
     avatarData: {
