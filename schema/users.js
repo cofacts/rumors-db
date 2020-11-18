@@ -3,13 +3,15 @@ export default {
     email: { type: 'keyword' },
     name: { type: 'keyword' },
     avatarUrl: { type: 'keyword' },
+    slug: { type: 'keyword' },
+    bio: { type: 'text' },
 
-    avatarType: { type: 'keyword' }, // url, gravatar, openpeeps
+    avatarType: { type: 'keyword' }, // AvatarTypeEnum: OpenPeeps/Gravatar/Facebook/Github
     avatarData: {
       type: 'keyword',
       index: false,
       doc_values: false,
-    }, // could be url or json props for openpeeps
+    }, // stringified json props for openpeeps
 
     appId: { type: 'keyword' },
     appUserId: { type: 'keyword' },
