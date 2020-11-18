@@ -38,7 +38,7 @@ export default {
         positiveFeedbackCount: { type: 'long' },
         negativeFeedbackCount: { type: 'long' },
 
-        // One reply can have multiple replyconnections.
+        // One reply can have multiple articlereplies.
         //
         replyId: { type: 'keyword' },
 
