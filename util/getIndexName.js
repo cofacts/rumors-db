@@ -1,5 +1,3 @@
-import { version } from '../package.json';
-
 /**
  * Generates the real index name with version from package.json
  *
@@ -7,5 +5,6 @@ import { version } from '../package.json';
  * @returns {string} The real index name with version postfix
  */
 export default function getIndexName(index) {
-  return `${index}_v${version.replace(/\./g, '_')}`;
+  const { VERSION } = require(`../schema/${index}.js`);
+  return `${index}_v${VERSION.replace(/\./g, '_')}`;
 }
