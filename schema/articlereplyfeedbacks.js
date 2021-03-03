@@ -1,3 +1,5 @@
+export const VERSION = '1.1.0';
+
 export default {
   properties: {
     // // The article ID and reply ID is used in calculating replyrequests' ID.

@@ -1,3 +1,5 @@
+export const VERSION = '1.1.0';
+
 export default {
   properties: {
     text: { type: 'text', analyzer: 'cjk_url_email' },

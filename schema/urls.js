@@ -1,3 +1,5 @@
+export const VERSION = '1.1.0';
+
 export default {
   properties: {
     url: { type: 'keyword' }, // exact URL found in the articles
