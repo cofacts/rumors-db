@@ -85,9 +85,14 @@ These commands are invoked by commands mentioned above. See `package.json` for d
 
 Deletes all indices.
 
-### `npm run schema`
+### `npm run schema [-- indexName]`
 
 Creates indices with specified mappings.
+
+By default it will create all indexes that exists in `schema/` directory, and will error if the index
+already exists.
+
+We can create one index by specifying `indexName` in the command.
 
 ### `npm run seed`
 
