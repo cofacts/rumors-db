@@ -70,9 +70,9 @@ elasticsearch mappings are not editable for opened indices.
 This can be done by:
 
 1. Manually bumping the schema version in the schema file
-2. Run `npm run reload <index file name>` (For instance, `npm run reload replyrequests`)
+2. Run `npm run reload -- <index file name>` (For instance, `npm run reload -- replyrequests`)
 
-The `npm run reload` would create indices with latest schema & package.json version postfix,
+The script would create indices with latest schema & package.json version postfix,
 perform reindex, modifies alias and removes the old index.
 
 ---
