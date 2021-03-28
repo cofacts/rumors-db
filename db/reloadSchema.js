@@ -24,7 +24,7 @@ try {
     __dirname,
     `../schema/${INDEX_NAME}.js`
   ));
-  INDEX_MAPPING = indexMapping;
+  INDEX_MAPPING = indexMapping.default;
 } catch (e) {
   if (e.code === 'MODULE_NOT_FOUND') {
     console.error(`There is no "${INDEX_NAME}.js" under schema directory.`);
@@ -126,9 +126,9 @@ async function main() {
     createResult.index
   );
   console.log(
-    `Reindexed from ${existingAlias} to ${createResult.index} in ${
-      reindexResult.took
-    } milliseconds.`
+    `Reindexed from ${existingAlias} to ${createResult.index} in ${Math.round(
+      reindexResult.took / 1000
+    )} seconds.`
   );
 
   await switchAndRemoveOldAlias(existingAlias);
