@@ -6,7 +6,7 @@ export default {
     name: { type: 'keyword' },
     avatarUrl: { type: 'keyword' },
     slug: { type: 'keyword' },
-    bio: { type: 'text' },
+    bio: { type: 'text', analyzer: 'cjk_url_email' },
 
     avatarType: { type: 'keyword' }, // AvatarTypeEnum: OpenPeeps/Gravatar/Facebook/Github
     avatarData: {

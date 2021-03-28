@@ -16,7 +16,7 @@ export default {
       properties: {
         url: { type: 'keyword' }, // exact URL found in the articles
         title: { type: 'text', analyzer: 'cjk' },
-        summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
+        summary: { type: 'text', analyzer: 'cjk_url_email' }, // Extracted summary text
       },
     },
   },

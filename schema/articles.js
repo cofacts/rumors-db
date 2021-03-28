@@ -69,7 +69,7 @@ export default {
         url: { type: 'keyword' }, // exact URL found in the articles
         normalizedUrl: { type: 'keyword' }, // URL after normalization (stored in urls)
         title: { type: 'text', analyzer: 'cjk' },
-        summary: { type: 'text', analyzer: 'cjk' }, // Extracted summary text
+        summary: { type: 'text', analyzer: 'cjk_url_email' }, // Extracted summary text
       },
     },
 
