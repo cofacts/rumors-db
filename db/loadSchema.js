@@ -26,10 +26,10 @@ async function loadSchema() {
         },
       });
     } catch (e) {
-      console.error(`Error creating index "${index}"`, e);
+      console.error(`Error creating index "${indexName}"`, e);
       throw e;
     }
-    console.log(`Index "${index}" created with mappings`);
+    console.log(`Index "${indexName}" created with mappings`);
   }
 }
 

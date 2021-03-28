@@ -20,9 +20,9 @@ For development, copy `.env.sample` to `.env` and make necessary changes.
 
 All mappings exist in `schema/` directory, with `schema/index.js` being the entry point.
 
-When loading tschema into DB using `npm run schema`, it appends `_vX.U.Z` in the created indecies,
+When loading tschema into DB using `npm run schema`, it appends `_${VERSION}` in the created indecies,
 
-then create an alias to the index name, according to `VERSION` const in the respective version file.
+then create an alias to the index name, according to `VERSION` const in the respective schema file.
 
 For example, the mappings in `schema/articles.js` would go to the index `articles_v1_0_0` and an
 alias from `articles` to `articles_v1_0_0` would be created after running `npm run schema`, given
