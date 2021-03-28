@@ -10,36 +10,52 @@ const client = new elasticsearch.Client({
   requestTimeout: 300000, // 5 min
 });
 
-const INDEX_NAME = process.argv[1];
+const INDEX_NAME = process.argv[2];
+
 if (!INDEX_NAME) {
-  console.error('Usage: npm run reload <schema-file-name-without-js>');
+  console.error('Usage: npm run reload -- <schema-file-name-without-js>');
   process.exit(1);
 }
-const { default: INDEX_MAPPING } = require(path.resolve(
-  __dirname,
-  `../schema/${INDEX_NAME}.js`
-));
+
+let INDEX_MAPPING;
+
+try {
+  const indexMapping = require(path.resolve(
+    __dirname,
+    `../schema/${INDEX_NAME}.js`
+  ));
+  INDEX_MAPPING = indexMapping;
+} catch (e) {
+  if (e.code === 'MODULE_NOT_FOUND') {
+    console.error(`There is no "${INDEX_NAME}.js" under schema directory.`);
+    process.exit(1);
+  }
+
+  // Unexpected error, re-throw
+  throw e;
+}
 
 /**
  * @returns {Promise<undefined>}
  */
 async function getExistingAlias() {
   const {
-    body: { error, status, ...currentIndexAliasMappings },
-  } = await client.indices
-    .getAlias({
-      name: INDEX_NAME,
-      ignoreUnavailable: true, // some aliasNames may be new
-    })
-    .catch(e => {
-      if (!e.body) throw e;
+    error,
+    body: currentIndexAliasMappings,
+  } = await client.indices.getAlias({ name: INDEX_NAME });
 
-      return e.body;
-    });
+  if (error) {
+    throw error;
+  }
 
-  console.info('[INFO] Error:', error, `status: ${status}`);
+  const realIndexNames = Object.keys(currentIndexAliasMappings);
+  if (realIndexNames.length !== 1) {
+    throw Error(
+      `getExistingAlias: ${INDEX_NAME} has no aliases, or has more than 1 aliases: ${realIndexNames}`
+    );
+  }
 
-  const realIndexName = currentIndexAliasMappings[INDEX_NAME].aliases[0];
+  const realIndexName = realIndexNames[0];
   const newIndexName = getIndexName(INDEX_NAME);
   if (realIndexName === newIndexName) {
     throw new Error(
@@ -53,22 +69,13 @@ async function getExistingAlias() {
 async function createNewIndex() {
   const indexName = getIndexName(INDEX_NAME);
 
-  return client.indices
-    .create({
-      index: indexName,
-      body: {
-        settings: indexSetting,
-        mappings: { doc: INDEX_MAPPING },
-      },
-    })
-    .catch(e => {
-      // Ignore already-exist errors.
-      // They might be error in previous runs, and they are not linked with alias yet.
-      if (e.body && e.body.error.type === 'resource_already_exists_exception')
-        return;
-
-      throw e;
-    });
+  return client.indices.create({
+    index: indexName,
+    body: {
+      settings: indexSetting,
+      mappings: { doc: INDEX_MAPPING },
+    },
+  });
 }
 
 function reindexExistingIndex(from, to) {
@@ -111,25 +118,25 @@ async function main() {
   const existingAlias = await getExistingAlias();
   console.log('Source: ', existingAlias);
 
-  const createResult = await createNewIndex();
-  console.log('Target: ', createResult.body.index);
+  const { body: createResult } = await createNewIndex();
+  console.log('Target: ', createResult.index);
 
-  const reindexResult = await reindexExistingIndex(
+  const { body: reindexResult } = await reindexExistingIndex(
     existingAlias,
-    createResult.body.index
+    createResult.index
   );
   console.log(
-    `Reindexed from ${existingAlias} to ${createResult.body.index} in ${
+    `Reindexed from ${existingAlias} to ${createResult.index} in ${
       reindexResult.took
     } milliseconds.`
   );
 
-  const removeResult = await switchAndRemoveOldAlias(existingAlias);
+  await switchAndRemoveOldAlias(existingAlias);
   console.log(
-    `Updated ${removeResult.body.updated} index alias and removed ${
-      removeResult.body.deleted
-    } index (${existingAlias}).`
+    `Setup ${
+      createResult.index
+    } -> ${INDEX_NAME} alias and remove ${existingAlias}.`
   );
 }
 
-main();
+main().catch(console.error);
