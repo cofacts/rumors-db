@@ -7,7 +7,7 @@ import indexSetting from '../util/indexSetting';
 
 const client = new elasticsearch.Client({
   node: process.env.ELASTICSEARCH_URL,
-  requestTimeout: 300000, // 5 min
+  requestTimeout: 30 * 60 * 1000, // 30 min
 });
 
 const INDEX_NAME = process.argv[2];
