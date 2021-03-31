@@ -1,3 +1,5 @@
+export const VERSION = '1.1.0';
+
 // A request from users for an article to be replied.
 // (articleId, userId, appId) should be unique throughout DB.
 //

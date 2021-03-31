@@ -1,124 +1,96 @@
-/*eslint import/namespace: ['error', { allowComputed: true }]*/
+import path from 'path';
 import 'dotenv/config';
 import '../util/catchUnhandledRejection';
 import elasticsearch from '@elastic/elasticsearch';
 import getIndexName from '../util/getIndexName';
 import indexSetting from '../util/indexSetting';
 
-import * as schema from '../schema';
-
 const client = new elasticsearch.Client({
   node: process.env.ELASTICSEARCH_URL,
-  requestTimeout: 300000, // 5 min
+  requestTimeout: 30 * 60 * 1000, // 30 min
 });
 
-const aliasNames = Object.keys(schema);
+const INDEX_NAME = process.argv[2];
 
-let aliasToOldIndexMap = {};
+if (!INDEX_NAME) {
+  console.error('Usage: npm run reload -- <schema-file-name-without-js>');
+  process.exit(1);
+}
+
+let INDEX_MAPPING;
+
+try {
+  const indexMapping = require(path.resolve(
+    __dirname,
+    `../schema/${INDEX_NAME}.js`
+  ));
+  INDEX_MAPPING = indexMapping.default;
+} catch (e) {
+  if (e.code === 'MODULE_NOT_FOUND') {
+    console.error(`There is no "${INDEX_NAME}.js" under schema directory.`);
+    process.exit(1);
+  }
+
+  // Unexpected error, re-throw
+  throw e;
+}
 
 /**
  * @returns {Promise<undefined>}
  */
-async function populateOldIndexMap() {
-  // Returns:
-  // { replies_v1_0_0: { aliases: { replies: {} } },
-  //   articles_v1_0_0: { aliases: { articles: {} } }, ... }
-
+async function getExistingAlias() {
   const {
-    body: { error, status, ...currentIndexAliasMappings },
-  } = await client.indices
-    .getAlias({
-      name: aliasNames,
-      ignoreUnavailable: true, // some aliasNames may be new
-    })
-    .catch(e => {
-      if (!e.body) throw e;
+    error,
+    body: currentIndexAliasMappings,
+  } = await client.indices.getAlias({ name: INDEX_NAME });
 
-      return e.body;
-    });
+  if (error) {
+    throw error;
+  }
 
-  console.info('[INFO] Error:', error, `status: ${status}`);
+  const realIndexNames = Object.keys(currentIndexAliasMappings);
+  if (realIndexNames.length !== 1) {
+    throw Error(
+      `getExistingAlias: ${INDEX_NAME} has no aliases, or has more than 1 aliases: ${realIndexNames}`
+    );
+  }
 
-  aliasToOldIndexMap = Object.keys(currentIndexAliasMappings).reduce(
-    (map, realIndexName) => {
-      const alias = Object.keys(
-        currentIndexAliasMappings[realIndexName].aliases
-      )[0];
-      map[alias] = realIndexName;
-      return map;
+  const realIndexName = realIndexNames[0];
+  const newIndexName = getIndexName(INDEX_NAME);
+  if (realIndexName === newIndexName) {
+    throw new Error(
+      `${newIndexName} already exists in current DB, abort operation.\nPlease bump VERSION in schema file, or remove the target index manually.`
+    );
+  }
+
+  return realIndexName;
+}
+
+async function createNewIndex() {
+  const indexName = getIndexName(INDEX_NAME);
+
+  return client.indices.create({
+    index: indexName,
+    body: {
+      settings: indexSetting,
+      mappings: { doc: INDEX_MAPPING },
     },
-    {}
-  );
-
-  // Check if any new index name will collide with existing old indexes.
-  // If so, abort operation.
-  aliasNames.forEach(alias => {
-    const newIndexName = getIndexName(alias);
-    if (currentIndexAliasMappings[newIndexName]) {
-      throw new Error(
-        `${newIndexName} already exists in current DB, abort operation.\nPlease bump version in package.json.`
-      );
-    }
   });
 }
 
-/**
- * @returns {Promise<object[]>}
- */
-function createNewIndexes() {
-  return Promise.all(
-    aliasNames.map(alias => {
-      const indexName = getIndexName(alias);
-
-      return client.indices
-        .create({
-          index: indexName,
-          body: {
-            settings: indexSetting,
-            mappings: { doc: schema[alias] },
-          },
-        })
-        .catch(e => {
-          // Ignore already-exist errors.
-          // They might be error in previous runs, and they are not linked with alias yet.
-          if (
-            e.body &&
-            e.body.error.type === 'resource_already_exists_exception'
-          )
-            return;
-
-          throw e;
-        })
-        .then(() => {
-          console.log(`Index "${alias}" created with mappings`);
-        });
-    })
-  );
-}
-
-/**
- * @returns {Promise<object[]>}
- */
-function reindexExistingIndexes() {
-  return Promise.all(
-    aliasNames.map(alias => {
-      const oldIndexName = aliasToOldIndexMap[alias];
-      if (!oldIndexName) return; // new alias that does not exist in DB
-
-      return client.reindex({
-        waitForCompletion: true,
-        body: {
-          source: { index: oldIndexName },
-          dest: {
-            index: getIndexName(alias),
-            type: 'doc',
-            op_type: 'create',
-          },
-          conflicts: 'proceed',
-        },
-      });
-    })
-  );
+function reindexExistingIndex(from, to) {
+  return client.reindex({
+    waitForCompletion: true,
+    body: {
+      source: { index: from },
+      dest: {
+        index: to,
+        type: 'doc',
+        op_type: 'create',
+      },
+      conflicts: 'proceed',
+    },
+  });
 }
 
 /**
@@ -128,30 +100,43 @@ function reindexExistingIndexes() {
  *
  * @returns {Promise<object>}
  */
-function switchAndRemoveAllAliases() {
-  const actions = aliasNames.reduce((actions, alias) => {
-    const newActions = [
-      {
-        add: { index: getIndexName(alias), alias },
-      },
-    ];
-    const oldIndexName = aliasToOldIndexMap[alias];
-    if (oldIndexName)
-      newActions.push({
-        remove_index: { index: oldIndexName },
-      });
-
-    return actions.concat(newActions);
-  }, []);
-
-  return client.indices.updateAliases({ body: { actions } });
+function switchAndRemoveOldAlias(oldIndexName) {
+  return client.indices.updateAliases({
+    body: {
+      actions: [
+        { add: { index: getIndexName(INDEX_NAME), alias: INDEX_NAME } },
+        { remove_index: { index: oldIndexName } },
+      ],
+    },
+  });
 }
 
 /**
  * Main script
  */
-Promise.resolve()
-  .then(populateOldIndexMap)
-  .then(createNewIndexes)
-  .then(reindexExistingIndexes)
-  .then(switchAndRemoveAllAliases);
+async function main() {
+  const existingAlias = await getExistingAlias();
+  console.log('Source: ', existingAlias);
+
+  const { body: createResult } = await createNewIndex();
+  console.log('Target: ', createResult.index);
+
+  const { body: reindexResult } = await reindexExistingIndex(
+    existingAlias,
+    createResult.index
+  );
+  console.log(
+    `Reindexed from ${existingAlias} to ${createResult.index} in ${Math.round(
+      reindexResult.took / 1000
+    )} seconds.`
+  );
+
+  await switchAndRemoveOldAlias(existingAlias);
+  console.log(
+    `Setup ${
+      createResult.index
+    } -> ${INDEX_NAME} alias and remove ${existingAlias}.`
+  );
+}
+
+main().catch(console.error);
