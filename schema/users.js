@@ -1,4 +1,4 @@
-export const VERSION = '1.1.0';
+export const VERSION = '1.2.0';
 
 export default {
   properties: {
@@ -21,6 +21,8 @@ export default {
     facebookId: { type: 'keyword' },
     githubId: { type: 'keyword' },
     twitterId: { type: 'keyword' },
+    googleId: { type: 'keyword' },
+    instagramId: { type: 'keyword' },
 
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
