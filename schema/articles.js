@@ -47,7 +47,7 @@ export default {
         // Current reply type
         replyType: { type: 'keyword' },
 
-        status: { type: 'keyword' }, // NORMAL, DELETED
+        status: { type: 'keyword' }, // NORMAL, DELETED, BLOCKED
         createdAt: { type: 'date' },
         updatedAt: { type: 'date' },
       },
@@ -92,7 +92,7 @@ export default {
         // Foreign key
         categoryId: { type: 'keyword' },
 
-        status: { type: 'keyword' }, // NORMAL, DELETED
+        status: { type: 'keyword' }, // NORMAL, DELETED, BLOCKED
         createdAt: { type: 'date' },
         updatedAt: { type: 'date' },
       },
