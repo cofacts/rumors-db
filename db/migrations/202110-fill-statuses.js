@@ -29,13 +29,21 @@ async function main() {
       index,
       type: 'doc',
       refresh: true,
-      conflicts: 'proceed',
       body: {
         script: {
           lang: 'painless',
           source: `
             ctx._source.status = 'NORMAL';
           `,
+        },
+        query: {
+          bool: {
+            must_not: {
+              exists: {
+                field: 'status',
+              },
+            },
+          },
         },
       },
     });
