@@ -1,4 +1,4 @@
-export const VERSION = '1.1.0';
+export const VERSION = '1.1.1';
 
 export default {
   properties: {
@@ -17,5 +17,7 @@ export default {
 
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
+
+    status: { type: 'keyword' }, // NORMAL, BLOCKED
   },
 };

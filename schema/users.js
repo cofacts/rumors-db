@@ -1,4 +1,4 @@
-export const VERSION = '1.2.0';
+export const VERSION = '1.2.1';
 
 export default {
   properties: {
@@ -29,5 +29,9 @@ export default {
 
     // Timestamp for the last time the user performed a rumors-api API call
     lastActiveAt: { type: 'date' },
+
+    // URL to the announcement that blocks this user.
+    // If given, the user is blocked from submitting visible contents.
+    blockedReason: { type: 'keyword' },
   },
 };
