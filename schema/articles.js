@@ -1,4 +1,4 @@
-export const VERSION = '1.1.0';
+export const VERSION = '1.2.0';
 
 export default {
   properties: {
@@ -97,5 +97,11 @@ export default {
         updatedAt: { type: 'date' },
       },
     },
+
+    articleType: { type: 'keyword' }, // TEXT, IMAGE, VIDEO, AUDIO
+
+    // There will be an attachment describing the file when articleType is not TEXT
+    attachmentUrl: { type: 'keyword' }, // URL stores the original file
+    attachmentHash: { type: 'keyword' }, // hash (Perceptual Hash) for identifying two similar file
   },
 };
