@@ -1,4 +1,4 @@
-export const VERSION = '1.1.0';
+export const VERSION = '1.2.0';
 
 export default {
   properties: {
@@ -17,6 +17,17 @@ export default {
         lineVisit: { type: 'long' },
         webUser: { type: 'long' },
         webVisit: { type: 'long' },
+
+        // LIFF traffic, breakdown by source
+        liff: {
+          type: 'nested',
+          properties: {
+            // Source can be '' if not specified
+            source: { type: 'keyword' },
+            user: { type: 'long' },
+            visit: { type: 'long' },
+          },
+        },
       },
     },
 
