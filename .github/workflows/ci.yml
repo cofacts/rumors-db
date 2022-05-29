@@ -1,0 +1,35 @@
+name: CI test
+
+on:
+  # Triggers the workflow on push or pull request events
+  - pull_request
+  - push
+  # Allows you to run this workflow manually from the Actions tab
+  - workflow_dispatch
+
+jobs:
+  install-and-test:
+    runs-on: ubuntu-latest
+    services:
+      rumors-test-db:
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
+        ports:
+          - 62223:9200
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - name: Test if schema loads
+        run: npm run test
+        env:
+          ELASTICSEARCH_URL: http://localhost:62223
+      - name: Test if seed loads
+        run: npm run seed
+        env:
+          ELASTICSEARCH_URL: http://localhost:62223
