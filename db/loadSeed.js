@@ -61,6 +61,21 @@ const SEEDS = {
     summary:
       '臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州 疲弊，此誠危急存亡之秋也。',
   },
+  '/analytics/article_some_id_date': {
+    date: new Date(),
+    docId: 'some-id',
+    fetchedAt: new Date(),
+    stats: {
+      lineUser: 100,
+      lineVisit: 102,
+      webUser: 104,
+      webVisit: 106,
+      liff: [
+        { source: '', user: 108, visit: 110 },
+        { source: 'some-bot', user: 50, visit: 51 },
+      ],
+    },
+  },
 };
 
 const client = new elasticsearch.Client({
