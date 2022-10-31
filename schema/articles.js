@@ -103,5 +103,7 @@ export default {
     // There will be an attachment describing the file when articleType is not TEXT
     attachmentUrl: { type: 'keyword' }, // URL stores the original file
     attachmentHash: { type: 'keyword' }, // hash (Perceptual Hash) for identifying two similar file
+
+    status: { type: 'keyword' }, // NORMAL, BLOCKED
   },
 };
