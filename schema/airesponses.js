@@ -7,7 +7,7 @@ export default {
     // the document ID for this response
     docId: { type: 'keyword' },
 
-    // article, or other types
+    // type of this AI response.
     type: { type: 'keyword' },
 
     // The user that requests an AI response
@@ -21,10 +21,10 @@ export default {
     // AI response text
     text: { type: 'text', analyzer: 'cjk_url_email' },
 
-    // The request to OpenAI. Just for record, not indexed.
+    // The request to AI endpoint. Just for record, not indexed.
     request: { type: 'keyword', index: false, doc_values: false },
 
-    // Token stats from OpenAI API.
+    // Token stats from AI endpoint response.
     usage: {
       type: 'object',
       properties: {
