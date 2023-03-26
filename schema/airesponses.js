@@ -1,6 +1,6 @@
 export const VERSION = '1.0.0';
 
-// A response from OpenAI.
+// A response from AI. Can be AI reply, OCR, speech to text, etc.
 //
 export default {
   properties: {
