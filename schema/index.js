@@ -7,6 +7,7 @@ import { default as replies } from './replies';
 import { default as replyrequests } from './replyrequests';
 import { default as urls } from './urls';
 import { default as users } from './users';
+import { default as airesponses } from './airesponses';
 
 export {
   analytics,
@@ -18,4 +19,5 @@ export {
   replyrequests,
   urls,
   users,
+  airesponses,
 };
