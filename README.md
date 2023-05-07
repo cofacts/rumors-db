@@ -5,7 +5,7 @@ Scripts for managing rumors db
 
 ## Installation
 
-Please first install Node.JS 12.
+Please first install Node.JS 18.
 
 ```
 $ npm i
@@ -15,12 +15,13 @@ $ npm i
 
 For development, copy `.env.sample` to `.env` and make necessary changes.
 
+## Elasticsearch
 
-## Index mapping versions
+### Index mapping versions
 
 All mappings exist in `schema/` directory, with `schema/index.js` being the entry point.
 
-When loading tschema into DB using `npm run schema`, it appends `_${VERSION}` in the created indecies,
+When loading schema into DB using `npm run schema`, it appends `_${VERSION}` in the created indexes,
 
 then create an alias to the index name, according to `VERSION` const in the respective schema file.
 
@@ -28,7 +29,7 @@ For example, the mappings in `schema/articles.js` would go to the index `article
 alias from `articles` to `articles_v1_0_0` would be created after running `npm run schema`, given
 that the `VERSION` in `schema/article.js` is `1.0.0`.
 
-## Running migrations
+### Running migrations
 
 All index mappings are already the latest, so if you are starting a database with fresh data,
 there is no need for migrations.
@@ -41,11 +42,11 @@ Migration scripts are put under `db/migrations`, which can be run as:
 $ ./node_modules/.bin/babel-node db/migrations/<migration script name>
 ```
 
-## Prepare database for unit test
+### Prepare database for unit test
 
 See [rumors-api](https://github.com/cofacts/rumors-api)
 
-## Backup production database and run on local machine
+### Backup production database and run on local machine
 
 According to [rumors-deploy](https://github.com/cofacts/rumors-deploy/), the production DB raw data
 should be available in `rumors-deploy/volumes/db-production`. (Staging is in `db-staging` instead).
@@ -62,10 +63,10 @@ $ docker-compose up
 This spins up elasticsearch on `localhost:62223`, with Kibana available in `localhost:62224`, using
 the data in `esdata`.
 
-## Updating schema for one index
+### Updating schema for one index
 
 After adding fields / removing fields from an index file, you will need to reload schema because
-elasticsearch mappings are not editable for opened indices.
+ElasticSearch mappings are not editable for opened indices.
 
 This can be done by:
 
@@ -74,6 +75,10 @@ This can be done by:
 
 The script would create indices with latest schema & package.json version postfix,
 perform reindex, modifies alias and removes the old index.
+
+## BigQuery
+
+Please manually create dataset, handle permission on Google Cloud, and setup related environment variables in `.env`.
 
 ---
 
