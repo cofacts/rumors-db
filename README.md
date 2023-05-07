@@ -80,6 +80,11 @@ perform reindex, modifies alias and removes the old index.
 
 Please manually create dataset, handle permission on Google Cloud, and setup related environment variables in `.env`.
 
+Run the following script to create big query tables under the dataset specified in the environment variable.
+```
+./node_modules/.bin/babel-node db/createBqTables.ts --extensions .ts,.js
+```
+
 ---
 
 ## Other commands
