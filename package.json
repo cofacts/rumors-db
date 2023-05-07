@@ -13,6 +13,9 @@
     "seed": "babel-node db/loadSeed.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "@babel/cli": "^7.8.0",
     "@babel/core": "^7.8.0",
