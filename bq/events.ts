@@ -16,7 +16,8 @@ const eventBatchSchema = z.object({
       category: z.string().nullable().describe('Event category'),
       action: z.string().nullable().describe('Event action'),
       label: z.string().nullable().describe('Event label'),
-    })
+      value: z.string().nullable().describe('Event value'),
+    }),
   ),
 });
 
