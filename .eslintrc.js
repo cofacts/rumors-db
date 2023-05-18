@@ -17,4 +17,11 @@ module.exports = {
     }],
     'no-console': 'off' // It's seed script! We use no-console a hell lot.
   },
+  overrides: [
+    {
+      files: ['**/*.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      plugins: ['@typescript-eslint'],
+    },
+  ],
 }

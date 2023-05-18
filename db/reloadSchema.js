@@ -133,9 +133,7 @@ async function main() {
 
   await switchAndRemoveOldAlias(existingAlias);
   console.log(
-    `Setup ${
-      createResult.index
-    } -> ${INDEX_NAME} alias and remove ${existingAlias}.`
+    `Setup ${createResult.index} -> ${INDEX_NAME} alias and remove ${existingAlias}.`
   );
 }
 
