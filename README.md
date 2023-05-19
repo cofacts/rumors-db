@@ -82,7 +82,7 @@ Please manually create dataset, handle permission on Google Cloud, and setup rel
 
 Run the following script to create big query tables under the dataset specified in the environment variable.
 ```
-./node_modules/.bin/babel-node db/createBqTables.ts --extensions .ts,.js
+./node_modules/.bin/babel-node db/setBqTables.ts --extensions .ts,.js
 ```
 
 ---
