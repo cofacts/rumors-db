@@ -7,6 +7,7 @@ import { convert } from 'zoq';
 export const TABLE = 'events';
 
 const eventBatchSchema = z.object({
+  userId: z.string().nullable(),
   createdAt: z.date().describe('Time of the event batch is sent'),
   text: z.string().describe('Message text').nullable(),
   messageSource: z.enum(['user', 'group', 'room']).nullable(),
