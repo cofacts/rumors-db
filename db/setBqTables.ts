@@ -11,7 +11,7 @@ const bqDataset = new BigQuery().dataset(
 );
 
 async function loadSchema({TABLE, SCHEMA}: {TABLE: string, SCHEMA: TableSchema[]}) {
-  const table = await bqDataset.table(TABLE);
+  const table = bqDataset.table(TABLE);
 
   if(await table.exists()) {
     const [result] = await table.setMetadata({schema: SCHEMA});
