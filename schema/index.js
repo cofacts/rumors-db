@@ -8,6 +8,7 @@ import { default as replyrequests } from './replyrequests';
 import { default as urls } from './urls';
 import { default as users } from './users';
 import { default as airesponses } from './airesponses';
+import { default as ydocs } from './ydocs';
 
 export {
   analytics,
@@ -20,4 +21,5 @@ export {
   urls,
   users,
   airesponses,
+  ydocs,
 };
