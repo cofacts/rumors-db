@@ -9,6 +9,7 @@ import { default as urls } from './urls';
 import { default as users } from './users';
 import { default as airesponses } from './airesponses';
 import { default as ydocs } from './ydocs';
+import { default as cooccurrences } from './cooccurrences';
 
 export {
   analytics,
@@ -22,4 +23,5 @@ export {
   users,
   airesponses,
   ydocs,
+  cooccurrences,
 };
