@@ -1,4 +1,4 @@
-export const VERSION = '1.3.0';
+export const VERSION = '1.4.0';
 
 export default {
   properties: {
@@ -105,5 +105,15 @@ export default {
     attachmentHash: { type: 'keyword' }, // hash (Perceptual Hash) for identifying two similar file
 
     status: { type: 'keyword' }, // NORMAL, BLOCKED
+
+    // transcript contributors
+    contributors: {
+      type: 'nested',
+      properties: {
+        userId: { type: 'keyword' },
+        appId: { type: 'keyword' },
+        updatedAt: { type: 'date' }, // last contribute time of the user
+      },
+    },
   },
 };
