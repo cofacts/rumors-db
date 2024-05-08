@@ -1,3 +1,5 @@
+import { ESDate } from '../util/types';
+
 export const VERSION = '1.0.0';
 
 /**
@@ -29,8 +31,8 @@ export type AIResponse = {
     totalTokens?: number;
   };
 
-  createdAt: Date;
-  updatedAt?: Date;
+  createdAt: ESDate;
+  updatedAt?: ESDate;
 };
 
 export const examples: AIResponse[] = [
@@ -42,7 +44,7 @@ export const examples: AIResponse[] = [
     type: 'AI_REPLY',
     status: 'SUCCESS',
     request: `{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"今天是2023年4月1日。你是協助讀者進行媒體識讀的小幫手。你說話時總是使用台灣繁體中文。有讀者傳了一則網路訊息給你。"},{"role":"user","content":"馬英九的祭文如下\n\n親愛的立安公公：您好！我是英九，您老人家的孫兒，爸爸鶴凌公的長子。"},{"role":"user","content":"請問作為閱聽人，我應該注意這則訊息的哪些地方呢？\n請節錄訊息中需要特別留意的地方，說明為何閱聽人需要注意它，謝謝。"}]}`,
-    createdAt: new Date('2023-04-01T22:26:16.225Z'),
+    createdAt: '2023-04-01T22:26:16.225Z',
     usage: {
       promptTokens: 1531,
       totalTokens: 1876,
@@ -53,18 +55,18 @@ export const examples: AIResponse[] = [
 
 2. 時間：訊息中提到了目前的日期以及歷史事件，需要注意其是否與實際情況相符。例如，訊息提到的日期是否正確，歷史事件的時間、地點等是否符合事實。
 `,
-    updatedAt: new Date('2023-04-01T22:26:34.227Z'),
+    updatedAt: '2023-04-01T22:26:34.227Z',
   },
   // Transcript example
   {
     userId: 'some-user-id',
     appId: 'line-bot',
     status: 'SUCCESS',
-    createdAt: new Date('2023-09-02T16:27:30.167Z'),
+    createdAt: '2023-09-02T16:27:30.167Z',
     type: 'TRANSCRIPT',
     docId: 'video.j4v21_q-3k4sIGXTda6J32MhJRXTIqs9GVCpZBfYdxM',
     text: '鬧大了。俄羅斯在聯合國公開宣稱武力介入日本核污染問題。',
-    updatedAt: new Date('2023-09-02T16:27:41.883Z'),
+    updatedAt: '2023-09-02T16:27:41.883Z',
   },
 ];
 
