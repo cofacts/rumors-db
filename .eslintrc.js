@@ -7,14 +7,17 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  env: {node: true, es6: true, jest: true},
-  plugins: [ 'prettier', 'import' ],
+  env: { node: true, es6: true, jest: true },
+  plugins: ['prettier', 'import'],
   rules: {
-    'prettier/prettier': ['error', {
-      trailingComma: 'es5',
-      'singleQuote': true,
-    }],
-    'no-console': 'off' // It's seed script! We use no-console a hell lot.
+    'prettier/prettier': [
+      'error',
+      {
+        trailingComma: 'es5',
+        singleQuote: true,
+      },
+    ],
+    'no-console': 'off', // It's seed script! We use no-console a hell lot.
   },
   settings: {
     'import/resolver': {
@@ -32,4 +35,4 @@ module.exports = {
       plugins: ['@typescript-eslint'],
     },
   ],
-}
+};

@@ -41,10 +41,8 @@ try {
  * @returns {Promise<undefined>}
  */
 async function getExistingAlias() {
-  const {
-    error,
-    body: currentIndexAliasMappings,
-  } = await client.indices.getAlias({ name: INDEX_NAME });
+  const { error, body: currentIndexAliasMappings } =
+    await client.indices.getAlias({ name: INDEX_NAME });
 
   if (error) {
     throw error;

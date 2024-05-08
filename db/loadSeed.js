@@ -21,8 +21,7 @@ const SEEDS = {
     replyRequestCount: 1,
     normalArticleReplyCount: 1,
     updatedAt: 2,
-    text:
-      '臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州 疲弊，此誠危急存亡之秋也。',
+    text: '臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州 疲弊，此誠危急存亡之秋也。',
   },
   '/articles/listArticleTest3': {
     userId: 'user2',
@@ -30,8 +29,7 @@ const SEEDS = {
     replyRequestCount: 0,
     normalArticleReplyCount: 0,
     updatedAt: 3,
-    text:
-      '人生幾何，離闊如此！況以膠漆之心，置於胡越之身，進不得相合，退不能相忘，牽攣乖隔，各欲白首。',
+    text: '人生幾何，離闊如此！況以膠漆之心，置於胡越之身，進不得相合，退不能相忘，牽攣乖隔，各欲白首。',
   },
   '/articles/listArticleTest4': {
     userId: 'user2',
@@ -85,7 +83,7 @@ const client = new elasticsearch.Client({
 async function loadSeeds(seedMap) {
   const body = [];
   const indexes = new Set();
-  Object.keys(seedMap).forEach(key => {
+  Object.keys(seedMap).forEach((key) => {
     const [, _index, _id] = key.split('/');
     body.push({ index: { _index, _type: 'doc', _id } });
     body.push(seedMap[key]);

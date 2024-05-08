@@ -44,7 +44,7 @@ async function loadSchema() {
   }
 }
 
-loadSchema().catch(e => {
+loadSchema().catch((e) => {
   console.error('[loadSchema]', e);
   process.exit(1);
 });

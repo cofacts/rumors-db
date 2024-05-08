@@ -18,9 +18,12 @@ const eventBatchSchema = z.object({
       action: z.string().nullable().describe('Event action'),
       label: z.string().nullable().describe('Event label'),
       value: z.number().nullable().describe('Event value'),
-    }),
+    })
   ),
-  extra: z.any().nullable().describe('Any other extra data that is set before the batch is sent'),
+  extra: z
+    .any()
+    .nullable()
+    .describe('Any other extra data that is set before the batch is sent'),
 });
 
 export const SCHEMA = convert(eventBatchSchema);
