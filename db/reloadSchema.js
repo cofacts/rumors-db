@@ -22,12 +22,14 @@ let INDEX_MAPPING;
 try {
   const indexMapping = require(path.resolve(
     __dirname,
-    `../schema/${INDEX_NAME}.js`
+    `../schema/${INDEX_NAME}`
   ));
   INDEX_MAPPING = indexMapping.default;
 } catch (e) {
   if (e.code === 'MODULE_NOT_FOUND') {
-    console.error(`There is no "${INDEX_NAME}.js" under schema directory.`);
+    console.error(
+      `There is no "${INDEX_NAME}.js" or "${INDEX_NAME}.ts" under schema directory.`
+    );
     process.exit(1);
   }
 

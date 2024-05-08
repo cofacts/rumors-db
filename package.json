@@ -7,8 +7,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "schema": "babel-node db/loadSchema.js",
-    "reload": "babel-node db/reloadSchema.js",
+    "schema": "babel-node --extensions .ts,.js db/loadSchema.js",
+    "reload": "babel-node --extensions .ts,.js db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
     "seed": "babel-node db/loadSeed.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
