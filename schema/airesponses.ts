@@ -1,39 +1,45 @@
-import { ESDate } from '../util/types';
+import { z } from 'zod';
+
+import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.0.0';
+
+export const aiResponseSchema = z.object({
+  /** The document ID for this response */
+  docId: z.string(),
+
+  /** type of this AI response. */
+  type: z.enum(['AI_REPLY', 'TRANSCRIPT']),
+
+  /** The user that requests an AI response */
+  userId: z.string(),
+  appId: z.string(),
+
+  status: z.enum(['LOADING', 'SUCCESS', 'ERROR']),
+
+  /** AI response text */
+  text: z.string().optional(),
+
+  /** The request to AI endpoint. Just for record, not indexed. */
+  request: z.string().optional(),
+
+  /** Token stats from AI endpoint response */
+  usage: z
+    .object({
+      promptTokens: z.number().optional(),
+      completionTokens: z.number().optional(),
+      totalTokens: z.number().optional(),
+    })
+    .optional(),
+
+  createdAt: dateSchema,
+  updatedAt: dateSchema.optional(),
+});
 
 /**
  * A response from AI. Can be AI reply, OCR, speech to text, etc.
  */
-export type AIResponse = {
-  /** the document ID for this response */
-  docId: string;
-
-  /** type of this AI response. */
-  type: 'AI_REPLY' | 'TRANSCRIPT';
-
-  /** The user that requests an AI response */
-  userId: string;
-  appId: string;
-
-  status: 'LOADING' | 'SUCCESS' | 'ERROR';
-
-  /** AI response text */
-  text?: string;
-
-  /** The request to AI endpoint. Just for record, not indexed. */
-  request?: string;
-
-  /** Token stats from AI endpoint response */
-  usage?: {
-    promptTokens?: number;
-    completionTokens?: number;
-    totalTokens?: number;
-  };
-
-  createdAt: ESDate;
-  updatedAt?: ESDate;
-};
+export type AIResponse = z.infer<typeof aiResponseSchema>;
 
 export const examples: AIResponse[] = [
   // AI response example

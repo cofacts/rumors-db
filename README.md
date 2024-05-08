@@ -22,7 +22,9 @@ For development, copy `.env.sample` to `.env` and make necessary changes.
 A schema file under `schema/` directory consists of:
 - `VERSION` -- see the next section for details.
 - The default export -- an object that represents the mapping of the index.
-- Exports a Typescript definition of the index name in UpperCamelCase.
+- Exports a zod schema named `<indexName>Schema`, which can be used to generate Typescript
+  definitions as well as use as validator.
+- Exports a Typescript definition of the index name in UpperCamelCase, created from zod.
 - The `examples` which is an array of the example data that can be inserted into the index and correctly type check.
   We use the examples to:
   - Provide readable examples of what is actually stored in ES index
