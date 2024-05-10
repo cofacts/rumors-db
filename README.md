@@ -118,6 +118,10 @@ already exists.
 
 We can create one index by specifying `indexName` in the command.
 
+### `npm run scan [-- indexName]`
+
+Scans through all existing document in `indexName` to see if the documents match the current zod schema.
+
 ### `npm run seed`
 
 Inserts seed (defined in `db/loadSeed.js`) into the database

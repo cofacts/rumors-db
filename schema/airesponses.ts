@@ -4,7 +4,7 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.0.0';
 
-export const aiResponseSchema = z.object({
+export const schema = z.object({
   /** The document ID for this response */
   docId: z.string(),
 
@@ -39,7 +39,7 @@ export const aiResponseSchema = z.object({
 /**
  * A response from AI. Can be AI reply, OCR, speech to text, etc.
  */
-export type AIResponse = z.infer<typeof aiResponseSchema>;
+export type AIResponse = z.infer<typeof schema>;
 
 export const examples: AIResponse[] = [
   // AI response example
