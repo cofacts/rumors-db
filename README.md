@@ -124,4 +124,4 @@ Scans through all existing document in `indexName` to see if the documents match
 
 ### `npm run seed`
 
-Inserts seed (defined in `db/loadSeed.js`) into the database
+Inserts examples in each schema into the database
