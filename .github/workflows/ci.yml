@@ -42,7 +42,12 @@ jobs:
         run: npm run test
         env:
           ELASTICSEARCH_URL: http://localhost:62223
-      - name: Test if seed loads
+      - name: Test if examples load
         run: npm run seed
         env:
           ELASTICSEARCH_URL: http://localhost:62223
+      - name: Test if examples match zod schema
+        run: npm run scan
+        env:
+          ELASTICSEARCH_URL: http://localhost:62223
+
