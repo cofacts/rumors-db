@@ -77,6 +77,7 @@ export const examples: AIResponse[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     docId: { type: 'keyword' },
 
