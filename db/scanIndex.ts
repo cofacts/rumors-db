@@ -8,6 +8,7 @@ import '../util/catchUnhandledRejection';
 import { Client } from '@elastic/elasticsearch';
 import getAllDocs from '../util/getAllDocs';
 import { ZodObject, ZodRawShape } from 'zod';
+import * as allSchema from '../schema';
 
 const MAX_ERROR = 25;
 
@@ -79,13 +80,23 @@ async function scanIndex(indexName: string) {
 }
 
 // Execute main when called from CLI
-if (require.main === module) {
+async function main() {
   const INDEX_NAME = process.argv[2];
-  if (!INDEX_NAME) {
-    console.error('Usage: npm run scan -- <schema-file-name-without-ts>');
-    process.exit(1);
+  const indexNames: string[] = [];
+
+  if (INDEX_NAME) {
+    indexNames.push(INDEX_NAME);
+  } else {
+    console.info('Scanning all indexes');
+    indexNames.push(...Object.keys(allSchema));
   }
-  scanIndex(INDEX_NAME).catch((e) => {
+
+  for (const indexName of indexNames) {
+    await scanIndex(indexName);
+  }
+}
+if (require.main === module) {
+  main().catch((e) => {
     console.error(e);
     process.exit(1);
   });

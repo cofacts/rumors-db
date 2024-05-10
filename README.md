@@ -122,6 +122,8 @@ We can create one index by specifying `indexName` in the command.
 
 Scans through all existing document in `indexName` to see if the documents match the current zod schema.
 
+If `indexName` is not given, all indexes in schema will be scanned.
+
 ### `npm run seed`
 
 Inserts examples in each schema into the database
