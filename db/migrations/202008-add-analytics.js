@@ -34,7 +34,7 @@ async function addNewIndices() {
           },
         },
       })
-      .catch(e => console.error(e));
+      .catch((e) => console.error(e));
     console.log(`Index "${key}" created with mappings`, result);
   }
 }

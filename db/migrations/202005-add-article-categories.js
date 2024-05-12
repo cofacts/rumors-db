@@ -34,8 +34,8 @@ async function addArticleCategory() {
         },
       },
     })
-    .then(resp => console.log(resp))
-    .catch(e => console.error(JSON.stringify(e, null, '  ')));
+    .then((resp) => console.log(resp))
+    .catch((e) => console.error(JSON.stringify(e, null, '  ')));
 }
 
 async function main() {

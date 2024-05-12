@@ -7,8 +7,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "schema": "babel-node db/loadSchema.js",
-    "reload": "babel-node db/reloadSchema.js",
+    "schema": "babel-node --extensions .ts,.js db/loadSchema.js",
+    "reload": "babel-node --extensions .ts,.js db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
     "seed": "babel-node db/loadSeed.js",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
@@ -39,10 +39,11 @@
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
     "babel-eslint": "^10.0.0",
-    "eslint": "^6.0.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^6.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^3.0.0",
-    "prettier": "^1.8.2"
+    "prettier": "^2.8.6"
   }
 }

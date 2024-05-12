@@ -186,9 +186,9 @@ async function main() {
   (await fetchAllDocs('articles_legacy')).forEach(
     ({ _id, _source: { replyConnectionIds, replyRequestIds } }) => {
       replyConnectionIds.forEach(
-        connId => (connectionIdToArticleId[connId] = _id)
+        (connId) => (connectionIdToArticleId[connId] = _id)
       );
-      replyRequestIds.forEach(reqId => (requestIdToArticleId[reqId] = _id));
+      replyRequestIds.forEach((reqId) => (requestIdToArticleId[reqId] = _id));
       articleIdToLastRequest[_id] = replyRequestIds.reduce(
         (lastDate, replyRequestId) => {
           const { createdAt } = replyRequestMap[replyRequestId];
@@ -223,7 +223,7 @@ async function main() {
         feedbackIds,
       },
     }) => {
-      feedbackIds.forEach(feedbackId => {
+      feedbackIds.forEach((feedbackId) => {
         feedbackIdToReplyId[feedbackId] = replyId;
         feedbackIdToArticleId[feedbackId] = connectionIdToArticleId[_id];
       });
@@ -231,7 +231,7 @@ async function main() {
       const articleId = connectionIdToArticleId[_id];
       const reply = replyMap[replyId];
       const scores = feedbackIds.map(
-        feedbackId => feedbackIdToScore[feedbackId]
+        (feedbackId) => feedbackIdToScore[feedbackId]
       );
 
       if (!articleIdToArticleReplies[articleId]) {
@@ -264,7 +264,7 @@ async function main() {
   //
 
   const operations = [];
-  Object.keys(articleIdToArticleReplies).forEach(articleId => {
+  Object.keys(articleIdToArticleReplies).forEach((articleId) => {
     const articleReplies = articleIdToArticleReplies[articleId];
     operations.push({
       update: {
@@ -283,7 +283,7 @@ async function main() {
     });
   });
 
-  Object.keys(articleIdToLastRequest).forEach(articleId => {
+  Object.keys(articleIdToLastRequest).forEach((articleId) => {
     operations.push({
       update: {
         _index: getIndexName('articles'),
@@ -298,7 +298,7 @@ async function main() {
     });
   });
 
-  Object.keys(requestIdToArticleId).forEach(requestId => {
+  Object.keys(requestIdToArticleId).forEach((requestId) => {
     const articleId = requestIdToArticleId[requestId];
 
     operations.push({
@@ -313,7 +313,7 @@ async function main() {
     });
   });
 
-  Object.keys(feedbackIdToArticleId).forEach(feedbackId => {
+  Object.keys(feedbackIdToArticleId).forEach((feedbackId) => {
     const articleId = feedbackIdToArticleId[feedbackId];
     const replyId = feedbackIdToReplyId[feedbackId];
 
