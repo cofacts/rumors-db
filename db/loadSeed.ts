@@ -10,12 +10,12 @@ const client = new Client({
 
 async function loadSeeds(seedMap: Record<string, unknown[]>) {
   const body: unknown[] = [];
-  const indexes = new Set();
   Object.keys(seedMap).forEach((key) => {
-    const [, _index, _id] = key.split('/');
-    body.push({ index: { _index, _type: 'doc', _id } });
-    body.push(seedMap[key]);
-    indexes.add(_index);
+    const fixtures = seedMap[key];
+    for (const fixture of fixtures) {
+      body.push({ index: { _index: key, _type: 'doc' } });
+      body.push(fixture);
+    }
   });
 
   const { body: result } = await client.bulk({ body, refresh: 'true' });
