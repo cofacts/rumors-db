@@ -12,17 +12,20 @@ async function loadSeeds(seedMap: Record<string, unknown[]>) {
   const body: unknown[] = [];
   Object.keys(seedMap).forEach((key) => {
     const fixtures = seedMap[key];
-    for (const fixture of fixtures) {
-      body.push({ index: { _index: key, _type: 'doc' } });
+    fixtures.forEach((fixture, idx) => {
+      body.push({
+        index: { _index: key, _type: 'doc', _id: `${key}-${idx + 1}` },
+      });
       body.push(fixture);
-    }
+    });
   });
 
   const { body: result } = await client.bulk({ body, refresh: 'true' });
+  const resultStr = JSON.stringify(result, null, '  ');
   if (result.errors) {
-    throw new Error(`Seed load failed : ${JSON.stringify(result, null, '  ')}`);
+    throw new Error(`[loadSeed] Seed load failed ${resultStr}`);
   } else {
-    console.info(`[loadSeed]`, result);
+    console.info(`[loadSeed] Success`, resultStr);
   }
 }
 
