@@ -21,6 +21,8 @@ async function loadSeeds(seedMap: Record<string, unknown[]>) {
   const { body: result } = await client.bulk({ body, refresh: 'true' });
   if (result.errors) {
     throw new Error(`Seed load failed : ${JSON.stringify(result, null, '  ')}`);
+  } else {
+    console.info(`[loadSeed]`, result);
   }
 }
 
@@ -29,7 +31,7 @@ loadSeeds(
     Object.keys(schema).map((indexName) => [
       indexName,
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require(path.resolve(__dirname, `../schema/${indexName}`)).examples,
+      require(path.resolve(__dirname, `../schema/${indexName}`)).examples ?? [],
     ])
   )
 ).catch((e) => {
