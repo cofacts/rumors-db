@@ -34,5 +34,7 @@ loadSeeds(
   )
 ).catch((e) => {
   console.error(e);
+  // Elasticsearch transport.js errors
+  if (e?.meta?.body) console.error(e.meta.body);
   process.exit(1);
 });
