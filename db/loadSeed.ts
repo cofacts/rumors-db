@@ -1,10 +1,10 @@
 import path from 'path';
 import 'dotenv/config';
 import '../util/catchUnhandledRejection';
-import elasticsearch from '@elastic/elasticsearch';
+import { Client } from '@elastic/elasticsearch';
 import * as schema from '../schema';
 
-const client = new elasticsearch.Client({
+const client = new Client({
   node: process.env.ELASTICSEARCH_URL,
 });
 
@@ -32,4 +32,7 @@ loadSeeds(
       require(path.resolve(__dirname, `../schema/${indexName}`)).examples,
     ])
   )
-);
+).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
