@@ -14,26 +14,30 @@ export const schema = z.object({
   fetchedAt: dateSchema,
 
   stats: z.object({
-    lineUser: z.number().nullable(),
-    lineVisit: z.number().nullable(),
-    webUser: z.number().nullable(),
-    webVisit: z.number().nullable(),
+    lineUser: z.number().nullable().optional(),
+    lineVisit: z.number().nullable().optional(),
+    webUser: z.number().nullable().optional(),
+    webVisit: z.number().nullable().optional(),
 
     /** LIFF traffic, breakdown by source  */
-    liff: z.array(
-      z.object({
-        // Source can be '' if not specified
-        source: z.string(),
-        user: z.number(),
-        visit: z.number(),
-      })
-    ),
+    liff: z
+      .array(
+        z.object({
+          // Source can be '' or null if not specified
+          source: z.string().nullable(),
+          user: z.number(),
+          visit: z.number(),
+        })
+      )
+      .optional(),
   }),
 
   type: z.enum(['article', 'reply']),
 
-  docUserId: z.string(),
-  docAppId: z.string(),
+  /** May not exist or is null for old records */
+  docUserId: z.string().nullable().optional(),
+  /** May not exist or is null for old records */
+  docAppId: z.string().nullable().optional(),
 });
 
 export type Analytics = z.infer<typeof schema>;

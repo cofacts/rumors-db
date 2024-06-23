@@ -15,13 +15,13 @@ export const schema = z.object({
   /** The user submits the feedback with which client. */
   appId: z.string(),
 
-  /** `users` index ID for the author of the reply */
-  replyUserId: z.string(),
+  /** `users` index ID for the author of the reply. May not exist for older doucments */
+  replyUserId: z.string().optional(),
 
-  /** `users` index ID for the author of the article-reply */
-  articleReplyUserId: z.string(),
+  /** `users` index ID for the author of the article-reply. May not exist for older doucments */
+  articleReplyUserId: z.string().optional(),
   score: z.number().int().min(-1).max(1),
-  comment: z.string().optional(),
+  comment: z.string().nullable().optional(),
   createdAt: dateSchema,
   updatedAt: dateSchema.optional(),
   status: z.enum(['NORMAL', 'BLOCKED']),
@@ -42,6 +42,18 @@ export const examples: ArticleReplyFeedback[] = [
     status: 'NORMAL',
     replyUserId: 'tM9Gd4oBrkRFoI6raPG9',
     articleReplyUserId: 'tM9Gd4oBrkRFoI6raPG9',
+  },
+
+  // Older documents
+  {
+    score: 1,
+    createdAt: '2021-05-15T04:42:37.528Z',
+    appId: 'RUMORS_LINE_BOT',
+    articleId: '3t467u6p8axzy',
+    replyId: 'Dqkya3kB9w1KR1Ik6KRS',
+    userId: 'j4S8C_355qXTmryzTOfpe17u00Z9CmGP5LQj8ApA7gF4v6FYw',
+    updatedAt: '2021-05-15T04:42:37.528Z',
+    status: 'NORMAL',
   },
 ];
 

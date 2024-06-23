@@ -6,8 +6,9 @@ export const VERSION = '1.4.0';
 
 export const schema = z.object({
   text: z.string(),
-  createdAt: dateSchema,
-  updatedAt: dateSchema.optional(),
+  // Can be null for very old sample messages
+  createdAt: dateSchema.nullable(),
+  updatedAt: dateSchema.optional().nullable(),
 
   /** User who submitted the article */
   userId: z.string(),
@@ -22,11 +23,11 @@ export const schema = z.object({
     z.object({
       type: z.string(), // LINE, URL, etc
       permalink: z.string().optional(), // permalink to the resource if applicable
-      createdAt: dateSchema,
+      createdAt: dateSchema.optional().nullable(),
 
       // auth
-      userId: z.string(),
-      appId: z.string(),
+      userId: z.string().optional(),
+      appId: z.string().optional(),
     })
   ),
 
@@ -48,8 +49,9 @@ export const schema = z.object({
       replyType: z.string(),
 
       status: z.enum(['NORMAL', 'DELETED', 'BLOCKED']),
-      createdAt: dateSchema,
-      updatedAt: dateSchema.optional(),
+      /** Can be null for very old replies */
+      createdAt: dateSchema.nullable(),
+      updatedAt: dateSchema.optional().nullable(),
     })
   ),
 
@@ -62,22 +64,24 @@ export const schema = z.object({
 
   /** Cached counter and timestamp from replyrequests */
   replyRequestCount: z.number(),
-  lastRequestedAt: dateSchema.optional(),
+  lastRequestedAt: dateSchema.nullable().optional(),
 
   /** Links in article text */
-  hyperlinks: z.array(
-    z.object({
-      /** exact URL found in the articles */
-      url: z.string(),
+  hyperlinks: z
+    .array(
+      z.object({
+        /** exact URL found in the articles */
+        url: z.string(),
 
-      /** URL after normalization (stored in urls) */
-      normalizedUrl: z.string(),
-      title: z.string(),
+        /** URL after normalization (stored in urls) */
+        normalizedUrl: z.string().optional(),
+        title: z.string().nullable(),
 
-      /** Extracted summary text */
-      summary: z.string().optional(),
-    })
-  ),
+        /** Extracted summary text */
+        summary: z.string().optional().nullable(),
+      })
+    )
+    .optional(),
 
   articleCategories: z.array(
     z.object({
@@ -274,6 +278,56 @@ export const examples: Article[] = [
     ],
     hyperlinks: [],
     updatedAt: '2023-11-07T06:30:21.312Z',
+    status: 'NORMAL',
+  },
+
+  // Old article
+  {
+    references: [
+      {
+        createdAt: null,
+        type: 'LINE',
+      },
+    ],
+    userId: '',
+    createdAt: null,
+    normalArticleCategoryCount: 1,
+    articleReplies: [
+      {
+        createdAt: null,
+        negativeFeedbackCount: 1,
+        replyType: 'RUMOR',
+        positiveFeedbackCount: 30,
+        appId: 'BOT_LEGACY',
+        replyId: 'sample3-answer',
+        userId: 'Z0k1e_htbn13DDaJVWuaGzkqM5joDs85R2L_sbTq1sFQ0UEo8',
+        status: 'DELETED',
+        updatedAt: '2017-09-09T16:04:32.111Z',
+      },
+    ],
+    normalArticleReplyCount: 2,
+    articleCategories: [
+      {
+        negativeFeedbackCount: 0,
+        createdAt: '2020-05-19T10:01:00.207Z',
+        positiveFeedbackCount: 1,
+        appId: 'DEVELOPMENT_BACKEND',
+        aiModel: 'bert',
+        userId: 'qO1C3_Mph8S3qfuQ5ylCX8Y-e7gc4ssfgBQN3t3JaKp5o06Pg',
+        aiConfidence: 1,
+        categoryId: 'mz2n7nEBrIRcahlYnQpz',
+        status: 'NORMAL',
+        updatedAt: '2020-05-19T10:01:00.207Z',
+      },
+    ],
+    articleType: 'TEXT',
+    replyRequestCount: 1,
+    appId: 'BOT_LEGACY',
+    lastRequestedAt: null,
+    text: '17:33 黄玉雪',
+    contributors: [],
+    hyperlinks: [],
+    updatedAt: null,
     status: 'NORMAL',
   },
 ];

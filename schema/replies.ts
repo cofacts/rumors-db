@@ -4,24 +4,28 @@ import { dateSchema } from '../util/sharedSchema';
 export const VERSION = '1.1.0';
 
 export const schema = z.object({
-  userId: z.string(),
-  appId: z.string(),
+  /** May be non-exist for very old sample replies */
+  userId: z.string().nullable().optional(),
+  appId: z.string().nullable(),
   type: z.enum(['RUMOR', 'NOT_RUMOR', 'OPINIONATED', 'NOT_ARTICLE']),
   text: z.string(),
-  reference: z.string(),
-  createdAt: dateSchema,
+  reference: z.string().optional(),
+
+  /** May be non-exist for very old sample replies */
+  createdAt: dateSchema.nullable(),
+  /** Links in article text */
   hyperlinks: z
     .array(
       z.object({
         /** exact URL found in the articles */
         url: z.string(),
-        title: z.string(),
 
         /** URL after normalization (stored in urls) */
-        normalizedUrl: z.string(),
+        normalizedUrl: z.string().optional(),
+        title: z.string().nullable(),
 
         /** Extracted summary text */
-        summary: z.string(),
+        summary: z.string().optional().nullable(),
       })
     )
     .optional(),
