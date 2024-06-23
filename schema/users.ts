@@ -76,7 +76,7 @@ export const examples: User[] = [
     lastActiveAt: '2024-06-15T22:04:05.161Z',
   },
   {
-    name: null, /** May be null for unknown reasons in rare cases */
+    name: null /** May be null for unknown reasons in rare cases */,
     githubId: '000000',
     createdAt: '2017-03-10T17:35:04.330Z',
     updatedAt: '2017-03-10T17:35:04.330Z',
