@@ -131,6 +131,8 @@ export const schema = z.object({
 });
 
 export type Article = z.infer<typeof schema>;
+export type ArticleReply = Article['articleReplies'][number];
+export type ArticleCategory = Article['articleCategories'][number];
 
 export const examples: Article[] = [
   /** Text */
