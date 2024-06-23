@@ -6,7 +6,7 @@ export const VERSION = '1.2.1';
 export const schema = z
   .object({
     email: z.string().optional(),
-    name: z.string(),
+    name: z.string().nullable(),
     avatarUrl: z.string().optional(),
     slug: z.string().optional(),
     bio: z.string().optional(),
@@ -18,10 +18,13 @@ export const schema = z
     avatarData: z.string().optional(),
 
     createdAt: dateSchema,
-    updatedAt: dateSchema,
+    updatedAt: dateSchema.optional(),
 
-    /** Timestamp for the last time the user performed a rumors-api API call */
-    lastActiveAt: dateSchema,
+    /**
+     * Timestamp for the last time the user performed a rumors-api API call.
+     * Can be empty for users created before this field is introduced.
+     */
+    lastActiveAt: dateSchema.optional(),
 
     /**
      * URL to the announcement that blocks this user.
@@ -71,6 +74,12 @@ export const examples: User[] = [
     createdAt: '2024-06-15T22:01:33.065Z',
     updatedAt: '2024-06-15T22:01:33.065Z',
     lastActiveAt: '2024-06-15T22:04:05.161Z',
+  },
+  {
+    name: null, /** May be null for unknown reasons in rare cases */
+    githubId: '000000',
+    createdAt: '2017-03-10T17:35:04.330Z',
+    updatedAt: '2017-03-10T17:35:04.330Z',
   },
 ];
 

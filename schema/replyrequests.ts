@@ -28,39 +28,41 @@ export const schema = z.object({
   /**
    * Why the ReplyRequest is created
    */
-  reason: z.string(),
+  reason: z.string().optional(),
 
   /**
    * Editor's feedbacks for the reply request's reason
    */
-  feedbacks: z.array(
-    z.object({
-      /**
-       * Auth
-       */
-      userId: z.string(),
-      appId: z.string(),
+  feedbacks: z
+    .array(
+      z.object({
+        /**
+         * Auth
+         */
+        userId: z.string(),
+        appId: z.string(),
 
-      /**
-       * The score of the feedback. Should be 1, 0, or -1.
-       */
-      score: z.number().int().min(-1).max(1),
-      createdAt: dateSchema,
-      updatedAt: dateSchema,
-    })
-  ),
+        /**
+         * The score of the feedback. Should be 1, 0, or -1.
+         */
+        score: z.number().int().min(-1).max(1),
+        createdAt: dateSchema,
+        updatedAt: dateSchema,
+      })
+    )
+    .optional(),
 
   /**
    * Counter cache for feedbacks
    */
-  positiveFeedbackCount: z.number().int(),
-  negativeFeedbackCount: z.number().int(),
+  positiveFeedbackCount: z.number().int().optional(),
+  negativeFeedbackCount: z.number().int().optional(),
 
   /**
    * The creation date of the reply request.
    */
-  createdAt: dateSchema,
-  updatedAt: dateSchema,
+  createdAt: dateSchema.nullable(),
+  updatedAt: dateSchema.optional(),
 
   status: z.enum(['NORMAL', 'BLOCKED']),
 });
@@ -68,7 +70,7 @@ export const schema = z.object({
 export type ReplyRequest = z.infer<typeof schema>;
 
 export const examples: ReplyRequest[] = [
-  // Empty example
+  // Empty examples
   {
     articleId: '2jkv7up5zsxvd',
     userId: 'j4S8C_8KsZJXEoHKNoC02Cciz8SHEYqgJTAeaKz_9-wGUu_iE',
@@ -79,6 +81,13 @@ export const examples: ReplyRequest[] = [
     negativeFeedbackCount: 0,
     createdAt: '2024-06-16T00:15:39.857Z',
     updatedAt: '2024-06-16T00:15:39.857Z',
+    status: 'NORMAL',
+  },
+  {
+    createdAt: null,
+    appId: 'BOT_LEGACY',
+    articleId: 'sample19-rumor',
+    userId: '',
     status: 'NORMAL',
   },
   // With feedbacks
