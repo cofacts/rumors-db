@@ -17,6 +17,20 @@ For development, copy `.env.sample` to `.env` and make necessary changes.
 
 ## Elasticsearch
 
+### Anatomy of a schema file
+
+A schema file under `schema/` directory consists of:
+- `VERSION` -- see the next section for details.
+- The default export -- an object that represents the mapping of the index.
+- Exports a zod schema named `<indexName>Schema`, which can be used to generate Typescript
+  definitions as well as use as validator.
+- Exports a Typescript definition of the index name in UpperCamelCase, created from zod.
+- The `examples` which is an array of the example data that can be inserted into the index and correctly type check.
+  We use the examples to:
+  - Provide readable examples of what is actually stored in ES index
+  - Check if the index schema is as expected
+  - Check if Typescript definition is as expected
+
 ### Index mapping versions
 
 All mappings exist in `schema/` directory, with `schema/index.js` being the entry point.
@@ -104,6 +118,12 @@ already exists.
 
 We can create one index by specifying `indexName` in the command.
 
+### `npm run scan [-- indexName]`
+
+Scans through all existing document in `indexName` to see if the documents match the current zod schema.
+
+If `indexName` is not given, all indexes in schema will be scanned.
+
 ### `npm run seed`
 
-Inserts seed (defined in `db/loadSeed.js`) into the database
+Inserts examples in each schema into the database
