@@ -124,6 +124,7 @@ export const schema = z.object({
       z.object({
         userId: z.string(),
         appId: z.string(),
+        /** last contribute time of the user */
         updatedAt: dateSchema,
       })
     )
