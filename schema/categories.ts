@@ -8,6 +8,10 @@ export const schema = z.object({
   description: z.string(),
   createdAt: dateSchema,
   updatedAt: dateSchema.optional(),
+
+  /** Populated by CreateCategory API */
+  userId: z.string().optional(),
+  appId: z.string().optional(),
 });
 
 export type Category = z.infer<typeof schema>;
@@ -29,5 +33,7 @@ export default {
     description: { type: 'text', analyzer: 'cjk' },
     createdAt: { type: 'date' },
     updatedAt: { type: 'date' },
+    userId: { type: 'keyword' },
+    appId: { type: 'keyword' },
   },
 };
