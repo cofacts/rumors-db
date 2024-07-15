@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.1.0';
+export const VERSION = '1.1.1';
 
 export const schema = z.object({
   /** May be non-exist for very old sample replies */

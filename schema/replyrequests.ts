@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.1.1';
+export const VERSION = '1.1.2';
 
 /**
  * A request from users for an article to be replied.

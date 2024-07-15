@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.4.0';
+export const VERSION = '1.4.1';
 
 export const schema = z.object({
   text: z.string(),
