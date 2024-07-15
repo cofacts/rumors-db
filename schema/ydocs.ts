@@ -36,6 +36,7 @@ export const examples: YDoc[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     ydoc: { type: 'binary' },
     versions: {

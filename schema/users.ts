@@ -84,6 +84,7 @@ export const examples: User[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     email: { type: 'keyword' },
     name: { type: 'keyword' },

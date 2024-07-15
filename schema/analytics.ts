@@ -84,6 +84,7 @@ export const examples: Analytics[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     date: { type: 'date' },
 

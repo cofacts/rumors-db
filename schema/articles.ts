@@ -336,6 +336,7 @@ export const examples: Article[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     text: { type: 'text', analyzer: 'cjk_url_email' },
     createdAt: { type: 'date' },

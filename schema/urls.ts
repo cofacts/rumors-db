@@ -79,6 +79,7 @@ export const examples: Url[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     url: { type: 'keyword' },
     canonical: { type: 'keyword' },

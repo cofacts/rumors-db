@@ -117,6 +117,7 @@ export const examples: ReplyRequest[] = [
 // (articleId, userId, appId) should be unique throughout DB.
 //
 export default {
+  dynamic: 'strict',
   properties: {
     articleId: { type: 'keyword' },
 
