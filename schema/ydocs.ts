@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.0.1';
+export const VERSION = '1.0.2';
 
 /**
  * Defines the schema for ydocs.
@@ -36,6 +36,7 @@ export const examples: YDoc[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     ydoc: { type: 'binary' },
     versions: {

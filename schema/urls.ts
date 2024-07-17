@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.1.0';
+export const VERSION = '1.1.1';
 
 /**
  * Schema definition for URLs.
@@ -79,6 +79,7 @@ export const examples: Url[] = [
 ];
 
 export default {
+  dynamic: 'strict',
   properties: {
     url: { type: 'keyword' },
     canonical: { type: 'keyword' },
