@@ -14,24 +14,28 @@ export const schema = z
     // the timestamp for when the data is fetched
     fetchedAt: dateSchema,
 
-    stats: z.object({
-      lineUser: z.number().nullable().optional(),
-      lineVisit: z.number().nullable().optional(),
-      webUser: z.number().nullable().optional(),
-      webVisit: z.number().nullable().optional(),
+    stats: z
+      .object({
+        lineUser: z.number().nullable().optional(),
+        lineVisit: z.number().nullable().optional(),
+        webUser: z.number().nullable().optional(),
+        webVisit: z.number().nullable().optional(),
 
-      /** LIFF traffic, breakdown by source  */
-      liff: z
-        .array(
-          z.object({
-            // Source can be '' or null if not specified
-            source: z.string().nullable(),
-            user: z.number(),
-            visit: z.number(),
-          })
-        )
-        .optional(),
-    }),
+        /** LIFF traffic, breakdown by source  */
+        liff: z
+          .array(
+            z
+              .object({
+                // Source can be '' or null if not specified
+                source: z.string().nullable(),
+                user: z.number(),
+                visit: z.number(),
+              })
+              .strict()
+          )
+          .optional(),
+      })
+      .strict(),
 
     type: z.enum(['article', 'reply']),
 

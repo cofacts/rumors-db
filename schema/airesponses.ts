@@ -31,6 +31,7 @@ export const schema = z
         completionTokens: z.number().optional(),
         totalTokens: z.number().optional(),
       })
+      .strict()
       .optional(),
 
     createdAt: dateSchema,

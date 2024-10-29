@@ -12,12 +12,14 @@ export const schema = z
     ydoc: z.string(),
     versions: z
       .array(
-        z.object({
-          /** Snapshot of the ydoc in binary format. */
-          snapshot: z.string(),
-          /** The creation date of the snapshot. */
-          createdAt: dateSchema,
-        })
+        z
+          .object({
+            /** Snapshot of the ydoc in binary format. */
+            snapshot: z.string(),
+            /** The creation date of the snapshot. */
+            createdAt: dateSchema,
+          })
+          .strict()
       )
       .optional(),
   })

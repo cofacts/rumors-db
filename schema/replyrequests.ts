@@ -36,20 +36,22 @@ export const schema = z
      */
     feedbacks: z
       .array(
-        z.object({
-          /**
-           * Auth
-           */
-          userId: z.string(),
-          appId: z.string(),
+        z
+          .object({
+            /**
+             * Auth
+             */
+            userId: z.string(),
+            appId: z.string(),
 
-          /**
-           * The score of the feedback. Should be 1, 0, or -1.
-           */
-          score: z.number().int().min(-1).max(1),
-          createdAt: dateSchema,
-          updatedAt: dateSchema,
-        })
+            /**
+             * The score of the feedback. Should be 1, 0, or -1.
+             */
+            score: z.number().int().min(-1).max(1),
+            createdAt: dateSchema,
+            updatedAt: dateSchema,
+          })
+          .strict()
       )
       .optional(),
 

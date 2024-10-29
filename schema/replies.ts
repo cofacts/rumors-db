@@ -17,17 +17,19 @@ export const schema = z
     /** Links in article text */
     hyperlinks: z
       .array(
-        z.object({
-          /** exact URL found in the articles */
-          url: z.string(),
+        z
+          .object({
+            /** exact URL found in the articles */
+            url: z.string(),
 
-          /** URL after normalization (stored in urls) */
-          normalizedUrl: z.string().optional(),
-          title: z.string().nullable(),
+            /** URL after normalization (stored in urls) */
+            normalizedUrl: z.string().optional(),
+            title: z.string().nullable(),
 
-          /** Extracted summary text */
-          summary: z.string().optional().nullable(),
-        })
+            /** Extracted summary text */
+            summary: z.string().optional().nullable(),
+          })
+          .strict()
       )
       .optional(),
   })
