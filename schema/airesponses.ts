@@ -4,37 +4,39 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.0.1';
 
-export const schema = z.object({
-  /** The document ID for this response */
-  docId: z.string(),
+export const schema = z
+  .object({
+    /** The document ID for this response */
+    docId: z.string(),
 
-  /** type of this AI response. */
-  type: z.enum(['AI_REPLY', 'TRANSCRIPT']),
+    /** type of this AI response. */
+    type: z.enum(['AI_REPLY', 'TRANSCRIPT']),
 
-  /** The user that requests an AI response */
-  userId: z.string(),
-  appId: z.string(),
+    /** The user that requests an AI response */
+    userId: z.string(),
+    appId: z.string(),
 
-  status: z.enum(['LOADING', 'SUCCESS', 'ERROR']),
+    status: z.enum(['LOADING', 'SUCCESS', 'ERROR']),
 
-  /** AI response text */
-  text: z.string().optional(),
+    /** AI response text */
+    text: z.string().optional(),
 
-  /** The request to AI endpoint. Just for record, not indexed. */
-  request: z.string().optional(),
+    /** The request to AI endpoint. Just for record, not indexed. */
+    request: z.string().optional(),
 
-  /** Token stats from AI endpoint response */
-  usage: z
-    .object({
-      promptTokens: z.number().optional(),
-      completionTokens: z.number().optional(),
-      totalTokens: z.number().optional(),
-    })
-    .optional(),
+    /** Token stats from AI endpoint response */
+    usage: z
+      .object({
+        promptTokens: z.number().optional(),
+        completionTokens: z.number().optional(),
+        totalTokens: z.number().optional(),
+      })
+      .optional(),
 
-  createdAt: dateSchema,
-  updatedAt: dateSchema.optional(),
-});
+    createdAt: dateSchema,
+    updatedAt: dateSchema.optional(),
+  })
+  .strict();
 
 /**
  * A response from AI. Can be AI reply, OCR, speech to text, etc.

@@ -4,41 +4,43 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.2.1';
 
-export const schema = z.object({
-  date: dateSchema,
+export const schema = z
+  .object({
+    date: dateSchema,
 
-  /** article id or reply id */
-  docId: z.string(),
+    /** article id or reply id */
+    docId: z.string(),
 
-  // the timestamp for when the data is fetched
-  fetchedAt: dateSchema,
+    // the timestamp for when the data is fetched
+    fetchedAt: dateSchema,
 
-  stats: z.object({
-    lineUser: z.number().nullable().optional(),
-    lineVisit: z.number().nullable().optional(),
-    webUser: z.number().nullable().optional(),
-    webVisit: z.number().nullable().optional(),
+    stats: z.object({
+      lineUser: z.number().nullable().optional(),
+      lineVisit: z.number().nullable().optional(),
+      webUser: z.number().nullable().optional(),
+      webVisit: z.number().nullable().optional(),
 
-    /** LIFF traffic, breakdown by source  */
-    liff: z
-      .array(
-        z.object({
-          // Source can be '' or null if not specified
-          source: z.string().nullable(),
-          user: z.number(),
-          visit: z.number(),
-        })
-      )
-      .optional(),
-  }),
+      /** LIFF traffic, breakdown by source  */
+      liff: z
+        .array(
+          z.object({
+            // Source can be '' or null if not specified
+            source: z.string().nullable(),
+            user: z.number(),
+            visit: z.number(),
+          })
+        )
+        .optional(),
+    }),
 
-  type: z.enum(['article', 'reply']),
+    type: z.enum(['article', 'reply']),
 
-  /** May not exist or is null for old records */
-  docUserId: z.string().nullable().optional(),
-  /** May not exist or is null for old records */
-  docAppId: z.string().nullable().optional(),
-});
+    /** May not exist or is null for old records */
+    docUserId: z.string().nullable().optional(),
+    /** May not exist or is null for old records */
+    docAppId: z.string().nullable().optional(),
+  })
+  .strict();
 
 export type Analytics = z.infer<typeof schema>;
 

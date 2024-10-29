@@ -6,48 +6,50 @@ export const VERSION = '1.1.1';
 /**
  * Schema definition for URLs.
  */
-export const schema = z.object({
-  /**
-   * Exact URL found in the articles.
-   */
-  url: z.string(),
-  /**
-   * The canonical URL fetched from the page.
-   */
-  canonical: z.string(),
-  /**
-   * Title of the page.
-   */
-  title: z.string(),
-  /**
-   * Extracted summary text.
-   */
-  summary: z.string(),
-  /**
-   * Fetched raw html input. Can be very long.
-   */
-  html: z.string(),
-  /**
-   * Image URL for preview. It could be a base64 string, which can be too long.
-   */
-  topImageUrl: z.string().optional(),
-  /**
-   * The date and time the URL was fetched.
-   */
-  fetchedAt: dateSchema,
-  /**
-   * Status code of the response.
-   */
-  status: z.number().int(),
-  /**
-   * Error returned by cofacts-url-resolver.
-   */
-  error: z.string().optional(),
-  /**
-   * rumors-api cleanupUrls.js script flag field.
-   */
-  isReferenced: z.boolean().optional(),
-});
+export const schema = z
+  .object({
+    /**
+     * Exact URL found in the articles.
+     */
+    url: z.string(),
+    /**
+     * The canonical URL fetched from the page.
+     */
+    canonical: z.string(),
+    /**
+     * Title of the page.
+     */
+    title: z.string(),
+    /**
+     * Extracted summary text.
+     */
+    summary: z.string(),
+    /**
+     * Fetched raw html input. Can be very long.
+     */
+    html: z.string(),
+    /**
+     * Image URL for preview. It could be a base64 string, which can be too long.
+     */
+    topImageUrl: z.string().optional(),
+    /**
+     * The date and time the URL was fetched.
+     */
+    fetchedAt: dateSchema,
+    /**
+     * Status code of the response.
+     */
+    status: z.number().int(),
+    /**
+     * Error returned by cofacts-url-resolver.
+     */
+    error: z.string().optional(),
+    /**
+     * rumors-api cleanupUrls.js script flag field.
+     */
+    isReferenced: z.boolean().optional(),
+  })
+  .strict();
 
 export type Url = z.infer<typeof schema>;
 

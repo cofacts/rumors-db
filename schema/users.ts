@@ -32,6 +32,7 @@ export const schema = z
      */
     blockedReason: z.string().optional(),
   })
+  .strict()
   .and(
     /** Auth related IDs */
     z.union([
