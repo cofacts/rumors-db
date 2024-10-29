@@ -68,7 +68,7 @@ async function scanIndex(indexName: string) {
     }
 
     processedCount += 1;
-    if (processedCount % 1000 === 0) {
+    if (processedCount % 10000 === 0) {
       console.log(`Processed ${processedCount} / ${count}`);
     }
   }
