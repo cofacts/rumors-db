@@ -4,132 +4,144 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.4.1';
 
-export const schema = z.object({
-  text: z.string(),
-  // Can be null for very old sample messages
-  createdAt: dateSchema.nullable(),
-  updatedAt: dateSchema.optional().nullable(),
+export const schema = z
+  .object({
+    text: z.string(),
+    // Can be null for very old sample messages
+    createdAt: dateSchema.nullable(),
+    updatedAt: dateSchema.optional().nullable(),
 
-  /** User who submitted the article */
-  userId: z.string(),
-  appId: z.string(),
+    /** User who submitted the article */
+    userId: z.string(),
+    appId: z.string(),
 
-  /**
-   * Where this article is posted.
-   * An article may be seen in multiple places, like blogs, FB posts or LINE messages.
-   * "references" field should be a list of such occurrences.
-   */
-  references: z.array(
-    z.object({
-      type: z.string(), // LINE, URL, etc
-      permalink: z.string().optional(), // permalink to the resource if applicable
-      createdAt: dateSchema.optional().nullable(),
+    /**
+     * Where this article is posted.
+     * An article may be seen in multiple places, like blogs, FB posts or LINE messages.
+     * "references" field should be a list of such occurrences.
+     */
+    references: z.array(
+      z
+        .object({
+          type: z.string(), // LINE, URL, etc
+          permalink: z.string().optional(), // permalink to the resource if applicable
+          createdAt: dateSchema.optional().nullable(),
 
-      // auth
-      userId: z.string().optional(),
-      appId: z.string().optional(),
-    })
-  ),
+          // auth
+          userId: z.string().optional(),
+          appId: z.string().optional(),
+        })
+        .strict()
+    ),
 
-  /** Linkage between articles and replies */
-  articleReplies: z.array(
-    z.object({
-      /** Who connected the replyId with the article. */
-      userId: z.string(),
-      appId: z.string(),
+    /** Linkage between articles and replies */
+    articleReplies: z.array(
+      z
+        .object({
+          /** Who connected the replyId with the article. */
+          userId: z.string(),
+          appId: z.string(),
 
-      /** Counter cache for feedbacks */
-      positiveFeedbackCount: z.number(),
-      negativeFeedbackCount: z.number(),
+          /** Counter cache for feedbacks */
+          positiveFeedbackCount: z.number(),
+          negativeFeedbackCount: z.number(),
 
-      /** One reply can have multiple articlereplies. */
-      replyId: z.string(),
+          /** One reply can have multiple articlereplies. */
+          replyId: z.string(),
 
-      /** Current reply type */
-      replyType: z.string(),
+          /** Current reply type */
+          replyType: z.string(),
 
-      status: z.enum(['NORMAL', 'DELETED', 'BLOCKED']),
-      /** Can be null for very old replies */
-      createdAt: dateSchema.nullable(),
-      updatedAt: dateSchema.optional().nullable(),
-    })
-  ),
+          status: z.enum(['NORMAL', 'DELETED', 'BLOCKED']),
+          /** Can be null for very old replies */
+          createdAt: dateSchema.nullable(),
+          updatedAt: dateSchema.optional().nullable(),
+        })
+        .strict()
+    ),
 
-  /**
-   * Cached counts of articleReplies with status = NORMAL.
-   * The length of nested objects cannot be used in filters...
-   */
-  normalArticleReplyCount: z.number(),
-  normalArticleCategoryCount: z.number(),
+    /**
+     * Cached counts of articleReplies with status = NORMAL.
+     * The length of nested objects cannot be used in filters...
+     */
+    normalArticleReplyCount: z.number(),
+    normalArticleCategoryCount: z.number(),
 
-  /** Cached counter and timestamp from replyrequests */
-  replyRequestCount: z.number(),
-  lastRequestedAt: dateSchema.nullable().optional(),
+    /** Cached counter and timestamp from replyrequests */
+    replyRequestCount: z.number(),
+    lastRequestedAt: dateSchema.nullable().optional(),
 
-  /** Links in article text */
-  hyperlinks: z
-    .array(
-      z.object({
-        /** exact URL found in the articles */
-        url: z.string(),
+    /** Links in article text */
+    hyperlinks: z
+      .array(
+        z
+          .object({
+            /** exact URL found in the articles */
+            url: z.string(),
 
-        /** URL after normalization (stored in urls) */
-        normalizedUrl: z.string().optional(),
-        title: z.string().nullable(),
+            /** URL after normalization (stored in urls) */
+            normalizedUrl: z.string().optional(),
+            title: z.string().nullable(),
 
-        /** Extracted summary text */
-        summary: z.string().optional().nullable(),
-      })
-    )
-    .optional(),
+            /** Extracted summary text */
+            summary: z.string().optional().nullable(),
+          })
+          .strict()
+      )
+      .optional(),
 
-  articleCategories: z.array(
-    z.object({
-      /**
-       * Who created the category
-       * Empty if the category is added by AI
-       */
-      userId: z.string().optional(),
-      appId: z.string().optional(),
+    articleCategories: z.array(
+      z
+        .object({
+          /**
+           * Who created the category
+           * Empty if the category is added by AI
+           */
+          userId: z.string().optional(),
+          appId: z.string().optional(),
 
-      /** exists only for AI tags */
-      aiModel: z.string().optional(),
-      aiConfidence: z.number().optional(),
+          /** exists only for AI tags */
+          aiModel: z.string().optional(),
+          aiConfidence: z.number().optional(),
 
-      /** Counter cache for feedbacks */
-      positiveFeedbackCount: z.number(),
-      negativeFeedbackCount: z.number(),
+          /** Counter cache for feedbacks */
+          positiveFeedbackCount: z.number(),
+          negativeFeedbackCount: z.number(),
 
-      /** Foreign key */
-      categoryId: z.string(),
+          /** Foreign key */
+          categoryId: z.string(),
 
-      status: z.enum(['NORMAL', 'DELETED', 'BLOCKED']),
-      createdAt: dateSchema,
-      updatedAt: dateSchema.optional(),
-    })
-  ),
+          status: z.enum(['NORMAL', 'DELETED', 'BLOCKED']),
+          createdAt: dateSchema,
+          updatedAt: dateSchema.optional(),
+        })
+        .strict()
+    ),
 
-  articleType: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'AUDIO']),
+    articleType: z.enum(['TEXT', 'IMAGE', 'VIDEO', 'AUDIO']),
 
-  /** There will be an attachment describing the file when articleType is not TEXT */
-  attachmentUrl: z.string().optional(),
-  /** hash (Perceptual Hash) for identifying two similar file */
-  attachmentHash: z.string().optional(),
+    /** There will be an attachment describing the file when articleType is not TEXT */
+    attachmentUrl: z.string().optional(),
+    /** hash (Perceptual Hash) for identifying two similar file */
+    attachmentHash: z.string().optional(),
 
-  status: z.enum(['NORMAL', 'BLOCKED']),
+    status: z.enum(['NORMAL', 'BLOCKED']),
 
-  /** transcript contributors */
-  contributors: z
-    .array(
-      z.object({
-        userId: z.string(),
-        appId: z.string(),
-        /** last contribute time of the user */
-        updatedAt: dateSchema,
-      })
-    )
-    .optional(),
-});
+    /** transcript contributors */
+    contributors: z
+      .array(
+        z
+          .object({
+            userId: z.string(),
+            appId: z.string(),
+            /** last contribute time of the user */
+            updatedAt: dateSchema,
+          })
+          .strict()
+      )
+      .optional(),
+  })
+  .strict();
 
 export type Article = z.infer<typeof schema>;
 export type ArticleReply = Article['articleReplies'][number];

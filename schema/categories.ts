@@ -3,16 +3,18 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.1.1';
 
-export const schema = z.object({
-  title: z.string(),
-  description: z.string(),
-  createdAt: dateSchema,
-  updatedAt: dateSchema.optional(),
+export const schema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    createdAt: dateSchema,
+    updatedAt: dateSchema.optional(),
 
-  /** Populated by CreateCategory API */
-  userId: z.string().optional(),
-  appId: z.string().optional(),
-});
+    /** Populated by CreateCategory API */
+    userId: z.string().optional(),
+    appId: z.string().optional(),
+  })
+  .strict();
 
 export type Category = z.infer<typeof schema>;
 

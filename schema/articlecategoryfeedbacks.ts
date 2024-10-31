@@ -3,19 +3,21 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.1.2';
 
-export const schema = z.object({
-  articleId: z.string(),
-  categoryId: z.string(),
-  userId: z.string(),
-  /** The user submits the feedback with which client. */
-  appId: z.string(),
-  score: z.number().int().min(-1).max(1),
-  /** user comment for the article category */
-  comment: z.string().optional(),
-  createdAt: dateSchema,
-  updatedAt: dateSchema.optional(),
-  status: z.enum(['NORMAL', 'BLOCKED']),
-});
+export const schema = z
+  .object({
+    articleId: z.string(),
+    categoryId: z.string(),
+    userId: z.string(),
+    /** The user submits the feedback with which client. */
+    appId: z.string(),
+    score: z.number().int().min(-1).max(1),
+    /** user comment for the article category */
+    comment: z.string().optional(),
+    createdAt: dateSchema,
+    updatedAt: dateSchema.optional(),
+    status: z.enum(['NORMAL', 'BLOCKED']),
+  })
+  .strict();
 
 export type ArticleCategoryFeedback = z.infer<typeof schema>;
 

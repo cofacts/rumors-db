@@ -137,4 +137,7 @@ async function main() {
   );
 }
 
-main().catch(console.error);
+main().catch((e) =>
+  // Complex errors if `meta` inside, try printing the whole object
+  'meta' in e ? console.error(JSON.stringify(e, null, '  ')) : console.error(e)
+);

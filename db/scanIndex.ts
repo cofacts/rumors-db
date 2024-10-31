@@ -68,7 +68,7 @@ async function scanIndex(indexName: string) {
     }
 
     processedCount += 1;
-    if (processedCount % 1000 === 0) {
+    if (processedCount % 10000 === 0) {
       console.log(`Processed ${processedCount} / ${count}`);
     }
   }
@@ -97,7 +97,11 @@ async function main() {
 }
 if (require.main === module) {
   main().catch((e) => {
-    console.error(e);
+    if ('meta' in e) {
+      console.error(JSON.stringify(e));
+    } else {
+      console.error(e);
+    }
     process.exit(1);
   });
 }

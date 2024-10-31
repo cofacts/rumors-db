@@ -31,14 +31,24 @@ export const schema = z
      * If given, the user is blocked from submitting visible contents.
      */
     blockedReason: z.string().optional(),
+
+    // Optional fields, more restrictions below
+    appId: z.string().optional(),
+    appUserId: z.string().optional(),
+    facebookId: z.string().optional(),
+    githubId: z.string().optional(),
+    twitterId: z.string().optional(),
+    googleId: z.string().optional(),
+    instagramId: z.string().optional(),
   })
+  .strict()
   .and(
     /** Auth related IDs */
     z.union([
       /** Provided for apps other than websites */
       z.object({
-        appId: z.string().optional(),
-        appUserId: z.string().optional(),
+        appId: z.string(),
+        appUserId: z.string(),
       }),
       /** Social login for web users */
       z.union([

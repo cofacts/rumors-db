@@ -3,19 +3,21 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.0.1';
 
-export const schema = z.object({
-  createdAt: dateSchema,
+export const schema = z
+  .object({
+    createdAt: dateSchema,
 
-  /** Last date the same user reported this combination of articles */
-  updatedAt: dateSchema.optional(),
+    /** Last date the same user reported this combination of articles */
+    updatedAt: dateSchema.optional(),
 
-  /** Who reported this cooccurrence */
-  userId: z.string(),
-  appId: z.string(),
+    /** Who reported this cooccurrence */
+    userId: z.string(),
+    appId: z.string(),
 
-  /** The articles */
-  articleIds: z.array(z.string()),
-});
+    /** The articles */
+    articleIds: z.array(z.string()),
+  })
+  .strict();
 
 export type Cooccurrence = z.infer<typeof schema>;
 

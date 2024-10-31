@@ -3,33 +3,37 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.1.1';
 
-export const schema = z.object({
-  /** May be non-exist for very old sample replies */
-  userId: z.string().nullable().optional(),
-  appId: z.string().nullable(),
-  type: z.enum(['RUMOR', 'NOT_RUMOR', 'OPINIONATED', 'NOT_ARTICLE']),
-  text: z.string(),
-  reference: z.string().optional(),
+export const schema = z
+  .object({
+    /** May be non-exist for very old sample replies */
+    userId: z.string().nullable().optional(),
+    appId: z.string().nullable(),
+    type: z.enum(['RUMOR', 'NOT_RUMOR', 'OPINIONATED', 'NOT_ARTICLE']),
+    text: z.string(),
+    reference: z.string().optional(),
 
-  /** May be non-exist for very old sample replies */
-  createdAt: dateSchema.nullable(),
-  /** Links in article text */
-  hyperlinks: z
-    .array(
-      z.object({
-        /** exact URL found in the articles */
-        url: z.string(),
+    /** May be non-exist for very old sample replies */
+    createdAt: dateSchema.nullable(),
+    /** Links in article text */
+    hyperlinks: z
+      .array(
+        z
+          .object({
+            /** exact URL found in the articles */
+            url: z.string(),
 
-        /** URL after normalization (stored in urls) */
-        normalizedUrl: z.string().optional(),
-        title: z.string().nullable(),
+            /** URL after normalization (stored in urls) */
+            normalizedUrl: z.string().optional(),
+            title: z.string().nullable(),
 
-        /** Extracted summary text */
-        summary: z.string().optional().nullable(),
-      })
-    )
-    .optional(),
-});
+            /** Extracted summary text */
+            summary: z.string().optional().nullable(),
+          })
+          .strict()
+      )
+      .optional(),
+  })
+  .strict();
 
 export type Reply = z.infer<typeof schema>;
 

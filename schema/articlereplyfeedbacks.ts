@@ -3,29 +3,31 @@ import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.2.1';
 
-export const schema = z.object({
-  /** Target article-reply's article */
-  articleId: z.string(),
-  /** Target article-reply's reply */
-  replyId: z.string(),
+export const schema = z
+  .object({
+    /** Target article-reply's article */
+    articleId: z.string(),
+    /** Target article-reply's reply */
+    replyId: z.string(),
 
-  /** `users` index ID for the author of the feedback */
-  userId: z.string(),
+    /** `users` index ID for the author of the feedback */
+    userId: z.string(),
 
-  /** The user submits the feedback with which client. */
-  appId: z.string(),
+    /** The user submits the feedback with which client. */
+    appId: z.string(),
 
-  /** `users` index ID for the author of the reply. May not exist for older doucments */
-  replyUserId: z.string().optional(),
+    /** `users` index ID for the author of the reply. May not exist for older doucments */
+    replyUserId: z.string().optional(),
 
-  /** `users` index ID for the author of the article-reply. May not exist for older doucments */
-  articleReplyUserId: z.string().optional(),
-  score: z.number().int().min(-1).max(1),
-  comment: z.string().nullable().optional(),
-  createdAt: dateSchema,
-  updatedAt: dateSchema.optional(),
-  status: z.enum(['NORMAL', 'BLOCKED']),
-});
+    /** `users` index ID for the author of the article-reply. May not exist for older doucments */
+    articleReplyUserId: z.string().optional(),
+    score: z.number().int().min(-1).max(1),
+    comment: z.string().nullable().optional(),
+    createdAt: dateSchema,
+    updatedAt: dateSchema.optional(),
+    status: z.enum(['NORMAL', 'BLOCKED']),
+  })
+  .strict();
 
 export type ArticleReplyFeedback = z.infer<typeof schema>;
 
