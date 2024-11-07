@@ -23,6 +23,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run gen:pubsub
       - name: Check if there is uncommitted changes after `npm run gen:pubsub`
+        # Reference: https://unix.stackexchange.com/a/662697
         run: test -z "$(git status --porcelain)"
 
   test:
