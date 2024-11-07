@@ -5,7 +5,7 @@ const schema: Schema = {
   name: 'AdminCommand',
   fields: [
     { name: 'command', type: 'string' },
-    { name: 'args', type: 'string' },
+    { name: 'args2', type: 'string' },
   ],
 };
 
