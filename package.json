@@ -13,6 +13,7 @@
     "clear": "babel-node db/clear.js",
     "seed": "babel-node --extensions .ts,.js db/loadSeed.ts",
     "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
+    "gen:pubsub": "babel-node --extensions .ts,.js db/genPubsubTypes && eslint --fix pubsub/types",
     "typecheck": "tsc"
   },
   "engines": {
@@ -29,6 +30,8 @@
     "@babel/preset-typescript": "^7.21.5",
     "@elastic/elasticsearch": "^6.8.6",
     "@google-cloud/bigquery": "^6.2.0",
+    "@ovotech/avro-ts": "^6.2.0",
+    "avsc": "^5.7.7",
     "dotenv": "^8.0.0",
     "typescript": "^5.0.4",
     "zod": "^3.21.4",

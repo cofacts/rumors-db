@@ -99,6 +99,24 @@ Run the following script to create big query tables under the dataset specified 
 ./node_modules/.bin/babel-node db/setBqTables.ts --extensions .ts,.js
 ```
 
+## Google Pubsub
+
+We define the Google Pubsub message schema for machine-to-machine communication of `rumors-api` under `pubsub/` directory.
+
+The schema should be in [`avro` format](https://cloud.google.com/pubsub/docs/schemas#avro-format), but defined in Typescript as a default export.
+
+`pubsub/index.ts` re-exports all the schemas in the directory.
+
+After defining the schema, run the following script to generate the Typescript type for them:
+```
+npm run gen:pubsub
+```
+
+To update the schema in Google Pubsub, run the following script:
+```
+TBA
+```
+
 ---
 
 ## Other commands
