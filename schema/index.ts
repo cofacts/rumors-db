@@ -10,6 +10,7 @@ import { default as users } from './users';
 import { default as airesponses } from './airesponses';
 import { default as ydocs } from './ydocs';
 import { default as cooccurrences } from './cooccurrences';
+import { default as badges } from './badges';
 
 export {
   analytics,
@@ -24,4 +25,5 @@ export {
   airesponses,
   ydocs,
   cooccurrences,
+  badges
 };
