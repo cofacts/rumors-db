@@ -2,14 +2,16 @@ import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
 export const VERSION = '1.0.0';
-
+/**
+ * - `displayName` is the compact version of `name`
+ * - `description` can contain Markdown syntax
+ */
 export const schema = z
   .object({
-    badgeId: z.string(),
     name: z.string(),
     displayName: z.string(),
     description: z.string(),
-    link: z.string(),
+    link: z.string().url(),
     icon: z.string(),
     badgeColor: z.string(),
     createdAt: dateSchema,
@@ -18,11 +20,10 @@ export const schema = z
   })
   .strict();
 
-export type Category = z.infer<typeof schema>;
+export type Badge = z.infer<typeof schema>;
 
-export const examples: Category[] = [
+export const examples: Badge[] = [
   {
-    badgeId: 'B0000000000000001',
     name: 'TFC事實查核培訓認證-2024',
     displayName: '事實查核培訓認證',
     description:
@@ -38,7 +39,6 @@ export const examples: Category[] = [
 export default {
   dynamic: 'strict',
   properties: {
-    badgeId: { type: 'text' },
     name: { type: 'text' },
     displayName: { type: 'text'},
     description: { type: 'text'},

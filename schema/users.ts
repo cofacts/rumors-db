@@ -48,17 +48,9 @@ export const schema = z
       .array(
         z
           .object({
-            /**
-             * Auth
-             */
             badgeId: z.string(),
             badgeMetaData: z.string(),
-            isDisplay: z.boolean(),
-
-            /**
-             * The score of the feedback. Should be 1, 0, or -1.
-             */
-            score: z.number().int().min(-1).max(1),
+            isDisplayed: z.boolean(),
             createdAt: dateSchema,
             updatedAt: dateSchema,
           })
@@ -101,7 +93,15 @@ export const examples: User[] = [
     createdAt: '2024-06-16T00:10:38.571Z',
     updatedAt: '2024-06-16T00:10:38.571Z',
     lastActiveAt: '2024-06-16T00:15:13.990Z',
-    badges: []
+    badges: [
+      {
+        badgeId: 'B000000000000000000000000',
+        badgeMetaData: '{"field":[["name":"標章名稱"],["userName":"申請人"],["applyDate":"申請日期"],["passDate":"通過日期"]],"data":{"name":"事實查核培訓認證","userName":"JayHuang","applyDate":"2024-11-14","passDate":"2024-11-15"}}',
+        isDisplayed: true,
+        createdAt: '2024-11-15T22:01:33.065Z',
+        updatedAt: '2024-11-15T22:01:33.065Z'
+      }
+    ]
   },
   // Web user
   {
@@ -159,7 +159,9 @@ export default {
       properties: {
         badgeId: { type: 'keyword' },
         badgeMetaData: { type: 'keyword' },
-        isDisplay: { type: 'boolean' }
+        isDisplayed: { type: 'boolean' },
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' }
       },
     },
   },
