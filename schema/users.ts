@@ -96,10 +96,11 @@ export const examples: User[] = [
     badges: [
       {
         badgeId: 'B000000000000000000000000',
-        badgeMetaData: '{"field":[["name":"標章名稱"],["userName":"申請人"],["applyDate":"申請日期"],["passDate":"通過日期"]],"data":{"name":"事實查核培訓認證","userName":"JayHuang","applyDate":"2024-11-14","passDate":"2024-11-15"}}',
+        badgeMetaData: 
+          '{"field":[["name":"標章名稱"],["userName":"申請人"],["applyDate":"申請日期"],["passDate":"通過日期"]],"data":{"name":"事實查核培訓認證","userName":"JayHuang","applyDate":"2024-11-14","passDate":"2024-11-15"}}',
         isDisplayed: true,
         createdAt: '2024-11-15T22:01:33.065Z',
-        updatedAt: '2024-11-15T22:01:33.065Z'
+        updatedAt: '2024-11-15T22:01:33.065Z',
       }
     ]
   },
@@ -111,14 +112,14 @@ export const examples: User[] = [
     createdAt: '2024-06-15T22:01:33.065Z',
     updatedAt: '2024-06-15T22:01:33.065Z',
     lastActiveAt: '2024-06-15T22:04:05.161Z',
-    badges: []
+    badges: [],
   },
   {
     name: null /** May be null for unknown reasons in rare cases */,
     githubId: '000000',
     createdAt: '2017-03-10T17:35:04.330Z',
     updatedAt: '2017-03-10T17:35:04.330Z',
-    badges: []
+    badges: [],
   },
 ];
 
@@ -161,7 +162,7 @@ export default {
         badgeMetaData: { type: 'keyword' },
         isDisplayed: { type: 'boolean' },
         createdAt: { type: 'date' },
-        updatedAt: { type: 'date' }
+        updatedAt: { type: 'date' },
       },
     },
   },
