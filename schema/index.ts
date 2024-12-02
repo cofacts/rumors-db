@@ -25,5 +25,5 @@ export {
   airesponses,
   ydocs,
   cooccurrences,
-  badges
+  badges,
 };
