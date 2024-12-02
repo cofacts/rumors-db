@@ -57,7 +57,6 @@ export const schema = z
           .strict()
       )
       .optional(),
-
   })
   .strict()
   .and(
@@ -96,13 +95,13 @@ export const examples: User[] = [
     badges: [
       {
         badgeId: 'B000000000000000000000000',
-        badgeMetaData: 
+        badgeMetaData:
           '{"field":[["name":"標章名稱"],["userName":"申請人"],["applyDate":"申請日期"],["passDate":"通過日期"]],"data":{"name":"事實查核培訓認證","userName":"JayHuang","applyDate":"2024-11-14","passDate":"2024-11-15"}}',
         isDisplayed: true,
         createdAt: '2024-11-15T22:01:33.065Z',
         updatedAt: '2024-11-15T22:01:33.065Z',
-      }
-    ]
+      },
+    ],
   },
   // Web user
   {
