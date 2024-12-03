@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.2.2';
+export const VERSION = '1.2.3';
 
 export const schema = z
   .object({
@@ -40,6 +40,23 @@ export const schema = z
     twitterId: z.string().optional(),
     googleId: z.string().optional(),
     instagramId: z.string().optional(),
+
+    /**
+     * User's badges
+     */
+    badges: z
+      .array(
+        z
+          .object({
+            badgeId: z.string(),
+            badgeMetaData: z.string(),
+            isDisplayed: z.boolean(),
+            createdAt: dateSchema,
+            updatedAt: dateSchema,
+          })
+          .strict()
+      )
+      .optional(),
   })
   .strict()
   .and(
@@ -75,6 +92,16 @@ export const examples: User[] = [
     createdAt: '2024-06-16T00:10:38.571Z',
     updatedAt: '2024-06-16T00:10:38.571Z',
     lastActiveAt: '2024-06-16T00:15:13.990Z',
+    badges: [
+      {
+        badgeId: 'B000000000000000000000000',
+        badgeMetaData:
+          '{"field":[["name":"標章名稱"],["userName":"申請人"],["applyDate":"申請日期"],["passDate":"通過日期"]],"data":{"name":"事實查核培訓認證","userName":"JayHuang","applyDate":"2024-11-14","passDate":"2024-11-15"}}',
+        isDisplayed: true,
+        createdAt: '2024-11-15T22:01:33.065Z',
+        updatedAt: '2024-11-15T22:01:33.065Z',
+      },
+    ],
   },
   // Web user
   {
@@ -84,12 +111,14 @@ export const examples: User[] = [
     createdAt: '2024-06-15T22:01:33.065Z',
     updatedAt: '2024-06-15T22:01:33.065Z',
     lastActiveAt: '2024-06-15T22:04:05.161Z',
+    badges: [],
   },
   {
     name: null /** May be null for unknown reasons in rare cases */,
     githubId: '000000',
     createdAt: '2017-03-10T17:35:04.330Z',
     updatedAt: '2017-03-10T17:35:04.330Z',
+    badges: [],
   },
 ];
 
@@ -124,5 +153,16 @@ export default {
     lastActiveAt: { type: 'date' },
 
     blockedReason: { type: 'keyword' },
+
+    badges: {
+      type: 'nested',
+      properties: {
+        badgeId: { type: 'keyword' },
+        badgeMetaData: { type: 'keyword' },
+        isDisplayed: { type: 'boolean' },
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
+      },
+    },
   },
 };
