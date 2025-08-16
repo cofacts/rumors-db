@@ -1,3 +1,6 @@
 config/local-*.js
 node_modules
 .env
+
+# Prevent google-github-actions/auth credentials being committed to git by accident
+gha-creds-*.json
