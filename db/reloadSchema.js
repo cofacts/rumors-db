@@ -41,12 +41,8 @@ try {
  * @returns {Promise<undefined>}
  */
 async function getExistingAlias() {
-  const { error, body: currentIndexAliasMappings } =
-    await client.indices.getAlias({ name: INDEX_NAME });
-
-  if (error) {
-    throw error;
-  }
+  const res = await client.indices.getAlias({ name: INDEX_NAME });
+  const currentIndexAliasMappings = res?.body !== undefined ? res.body : res;
 
   const realIndexNames = Object.keys(currentIndexAliasMappings);
   if (realIndexNames.length !== 1) {
@@ -69,11 +65,12 @@ async function getExistingAlias() {
 async function createNewIndex() {
   const indexName = getIndexName(INDEX_NAME);
 
+  // ES 8+ removed mapping types; use root mapping (no "doc" wrapper)
   return client.indices.create({
     index: indexName,
     body: {
       settings: indexSetting,
-      mappings: { doc: INDEX_MAPPING },
+      mappings: INDEX_MAPPING,
     },
   });
 }
@@ -85,7 +82,6 @@ function reindexExistingIndex(from, to) {
       source: { index: from },
       dest: {
         index: to,
-        type: 'doc',
         op_type: 'create',
       },
       conflicts: 'proceed',
@@ -118,13 +114,15 @@ async function main() {
   const existingAlias = await getExistingAlias();
   console.log('Source: ', existingAlias);
 
-  const { body: createResult } = await createNewIndex();
+  const createRaw = await createNewIndex();
+  const createResult = createRaw?.body !== undefined ? createRaw.body : createRaw;
   console.log('Target: ', createResult.index);
 
-  const { body: reindexResult } = await reindexExistingIndex(
+  const reindexRaw = await reindexExistingIndex(
     existingAlias,
     createResult.index
   );
+  const reindexResult = reindexRaw?.body !== undefined ? reindexRaw.body : reindexRaw;
   console.log(
     `Reindexed from ${existingAlias} to ${createResult.index} in ${Math.round(
       reindexResult.took / 1000

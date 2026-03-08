@@ -9,18 +9,18 @@ const client = new Client({
 });
 
 async function loadSeeds(seedMap: Record<string, unknown[]>) {
-  const body: unknown[] = [];
+  const operations: unknown[] = [];
   Object.keys(seedMap).forEach((key) => {
     const fixtures = seedMap[key];
     fixtures.forEach((fixture, idx) => {
-      body.push({
-        index: { _index: key, _type: 'doc', _id: `${key}-${idx + 1}` },
+      operations.push({
+        index: { _index: key, _id: `${key}-${idx + 1}` },
       });
-      body.push(fixture);
+      operations.push(fixture);
     });
   });
 
-  const { body: result } = await client.bulk({ body, refresh: 'true' });
+  const result = await client.bulk({ operations, refresh: 'true' });
   const resultStr = JSON.stringify(result, null, '  ');
   if (result.errors) {
     throw new Error(`[loadSeed] Seed load failed ${resultStr}`);
