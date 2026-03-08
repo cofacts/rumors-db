@@ -23,40 +23,50 @@ const client = new Client({
 });
 
 async function createV9Indices() {
-  const schemaNames = Object.keys(schema).filter((k) => typeof schema[k] === 'object' && schema[k].properties);
+  const schemaNames = Object.keys(schema).filter(
+    (k) => typeof schema[k] === 'object' && schema[k].properties
+  );
   for (const index of schemaNames) {
     const baseName = getIndexName(index);
     const indexName = `${baseName}-v9`;
     try {
       const exists = await client.indices.exists({ index: indexName });
       if (exists) {
-        const aliasRes = await client.indices.getAlias({ name: index }).catch(() => ({}));
-        const aliasMapping = aliasRes && aliasRes.body !== undefined ? aliasRes.body : aliasRes || {};
-        const indicesWithAlias = typeof aliasMapping === 'object' && aliasMapping !== null ? Object.keys(aliasMapping) : [];
+        const aliasRes = await client.indices
+          .getAlias({ name: index })
+          .catch(() => ({}));
+        const aliasMapping = aliasRes || {};
+        const indicesWithAlias =
+          typeof aliasMapping === 'object' && aliasMapping !== null
+            ? Object.keys(aliasMapping)
+            : [];
         const actions = [];
         indicesWithAlias.forEach((idx) => {
-          if (idx !== indexName) actions.push({ remove: { index: idx, alias: index } });
+          if (idx !== indexName)
+            actions.push({ remove: { index: idx, alias: index } });
         });
         if (!indicesWithAlias.includes(indexName)) {
           actions.push({ add: { index: indexName, alias: index } });
         }
         if (actions.length > 0) {
-          await client.indices.updateAliases({ body: { actions } });
+          await client.indices.updateAliases({ actions });
           console.log(`Index "${indexName}" alias "${index}" updated`);
         } else {
-          console.log(`Index "${indexName}" already exists with alias "${index}", skip`);
+          console.log(
+            `Index "${indexName}" already exists with alias "${index}", skip`
+          );
         }
         continue;
       }
       await client.indices.create({
         index: indexName,
-        body: {
-          settings: indexSetting,
-          mappings: schema[index],
-          aliases: { [index]: {} },
-        },
+        settings: indexSetting,
+        mappings: schema[index],
+        aliases: { [index]: {} },
       });
-      console.log(`Index "${indexName}" created with mappings and alias "${index}"`);
+      console.log(
+        `Index "${indexName}" created with mappings and alias "${index}"`
+      );
     } catch (e) {
       console.error(`Error creating index "${indexName}"`, e);
       throw e;
