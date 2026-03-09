@@ -64,7 +64,7 @@ do
 
     echo " > 任務啟動: ${SOURCE_INDEX} -> ${DEST_INDEX}"
 
-    curl -X POST "${DEST_HOST}/_reindex?wait_for_completion=false&pretty" -H 'Content-Type: application/json' -d"
+    curl -X POST "http://${DEST_HOST}/_reindex?wait_for_completion=false&pretty" -H 'Content-Type: application/json' -d"
 {
   \"source\": {
     \"remote\": {
