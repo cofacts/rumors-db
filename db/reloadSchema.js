@@ -1,11 +1,11 @@
 import path from 'path';
 import 'dotenv/config';
 import '../util/catchUnhandledRejection';
-import elasticsearch from '@elastic/elasticsearch';
+import { Client } from '@elastic/elasticsearch';
 import getIndexName from '../util/getIndexName';
 import indexSetting from '../util/indexSetting';
 
-const client = new elasticsearch.Client({
+const client = new Client({
   node: process.env.ELASTICSEARCH_URL,
   requestTimeout: 30 * 60 * 1000, // 30 min
 });
@@ -41,12 +41,8 @@ try {
  * @returns {Promise<undefined>}
  */
 async function getExistingAlias() {
-  const { error, body: currentIndexAliasMappings } =
-    await client.indices.getAlias({ name: INDEX_NAME });
-
-  if (error) {
-    throw error;
-  }
+  const res = await client.indices.getAlias({ name: INDEX_NAME });
+  const currentIndexAliasMappings = res;
 
   const realIndexNames = Object.keys(currentIndexAliasMappings);
   if (realIndexNames.length !== 1) {
@@ -69,45 +65,39 @@ async function getExistingAlias() {
 async function createNewIndex() {
   const indexName = getIndexName(INDEX_NAME);
 
+  // ES 8+ removed mapping types; use root mapping (no "doc" wrapper)
   return client.indices.create({
     index: indexName,
-    body: {
-      settings: indexSetting,
-      mappings: { doc: INDEX_MAPPING },
-    },
+    settings: indexSetting,
+    mappings: INDEX_MAPPING,
   });
 }
 
 function reindexExistingIndex(from, to) {
   return client.reindex({
     waitForCompletion: true,
-    body: {
-      source: { index: from },
-      dest: {
-        index: to,
-        type: 'doc',
-        op_type: 'create',
-      },
-      conflicts: 'proceed',
+    source: { index: from },
+    dest: {
+      index: to,
+      op_type: 'create',
     },
+    conflicts: 'proceed',
   });
 }
 
 /**
  * Switch alias to new index and remove old indexes in one go.
  *
- * Reference: https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-aliases.html
+ * Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
  *
  * @returns {Promise<object>}
  */
 function switchAndRemoveOldAlias(oldIndexName) {
   return client.indices.updateAliases({
-    body: {
-      actions: [
-        { add: { index: getIndexName(INDEX_NAME), alias: INDEX_NAME } },
-        { remove_index: { index: oldIndexName } },
-      ],
-    },
+    actions: [
+      { add: { index: getIndexName(INDEX_NAME), alias: INDEX_NAME } },
+      { remove_index: { index: oldIndexName } },
+    ],
   });
 }
 
@@ -118,10 +108,10 @@ async function main() {
   const existingAlias = await getExistingAlias();
   console.log('Source: ', existingAlias);
 
-  const { body: createResult } = await createNewIndex();
+  const createResult = await createNewIndex();
   console.log('Target: ', createResult.index);
 
-  const { body: reindexResult } = await reindexExistingIndex(
+  const reindexResult = await reindexExistingIndex(
     existingAlias,
     createResult.index
   );

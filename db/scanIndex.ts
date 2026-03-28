@@ -41,16 +41,13 @@ async function scanIndex(indexName: string) {
 
   if (!schema) return;
 
-  const {
-    body: { count },
-  } = await client.count({
+  const countRes = await client.count({
     index: indexName,
-    body: {
-      query: {
-        match_all: {},
-      },
+    query: {
+      match_all: {},
     },
   });
+  const count = countRes.count;
   console.info(`Total docs in index ${indexName}: ${count}`);
 
   let processedCount = 0;
