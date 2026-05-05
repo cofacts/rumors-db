@@ -12,7 +12,7 @@
     "reload": "babel-node --extensions .ts,.js db/reloadSchema.js",
     "clear": "babel-node db/clear.js",
     "seed": "babel-node --extensions .ts,.js db/loadSeed.ts",
-    "test": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
+    "prepare-test-db": "NODE_ENV=test npm run clear && NODE_ENV=test npm run schema",
     "typecheck": "tsc"
   },
   "engines": {
