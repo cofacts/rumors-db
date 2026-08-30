@@ -75,7 +75,7 @@ async function createNewIndex() {
 
 function reindexExistingIndex(from, to) {
   return client.reindex({
-    waitForCompletion: true,
+    wait_for_completion: true,
     source: { index: from },
     dest: {
       index: to,
