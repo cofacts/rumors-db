@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.4.1';
+export const VERSION = '1.5.0';
 
 export const schema = z
   .object({
@@ -140,12 +140,53 @@ export const schema = z
           .strict()
       )
       .optional(),
+
+    /**
+     * Dense-vector embeddings for hybrid search. Read path scores against
+     * these via a nested KNN retriever.
+     *
+     * Currently there is always exactly one entry per article: TEXT articles
+     * embed their text, and AUDIO / VIDEO embed only their first
+     * `EMBEDDING_MEDIA_MAX_SEC` (80) seconds, which is the hard limit of a
+     * single Gemini Embedding media input. Nothing is chunked yet, so
+     * `startOffsetSec` / `endOffsetSec` are never written — they are
+     * reserved for a future chunked implementation (having them in the
+     * mapping already means adding chunking later needs no migration).
+     *
+     * `vector` is optional because ES 9 excludes `dense_vector` from the
+     * default `_source` (`index.mapping.exclude_source_vectors`, on by
+     * default for newly created indices) — a plain GET returns `[{}]`, so a
+     * required `vector` would make `npm run scan` fail on every embedded doc.
+     * Reindex / recovery still rehydrate it from doc values, so the data
+     * itself is not lost. Note that `airesponses.embeddings` uses a different
+     * mechanism and keeps `vector` required; see the comment there.
+     */
+    embeddings: z
+      .array(
+        z
+          .object({
+            vector: z.array(z.number()).length(768).optional(),
+            startOffsetSec: z.number().int().nonnegative().optional(),
+            endOffsetSec: z.number().int().nonnegative().optional(),
+          })
+          .strict()
+      )
+      .optional(),
   })
   .strict();
 
 export type Article = z.infer<typeof schema>;
 export type ArticleReply = Article['articleReplies'][number];
 export type ArticleCategory = Article['articleCategories'][number];
+
+/**
+ * Dummy embedding for `examples`, so that `npm run seed` actually exercises the
+ * `dense_vector` mapping — if `dims` here and `EMBEDDING_DIMS` in rumors-api
+ * ever drift apart, the bulk request fails and CI catches it right away.
+ *
+ * Must not be all-zero: `similarity: 'cosine'` rejects zero-magnitude vectors.
+ */
+const EXAMPLE_VECTOR = Array.from({ length: 768 }, () => 0.1);
 
 export const examples: Article[] = [
   /** Text */
@@ -184,6 +225,7 @@ export const examples: Article[] = [
     attachmentHash: '',
     status: 'NORMAL',
     lastRequestedAt: '2024-01-27T22:05:58.584Z',
+    embeddings: [{ vector: EXAMPLE_VECTOR }],
   },
 
   /** Video */
@@ -223,6 +265,9 @@ export const examples: Article[] = [
     hyperlinks: [],
     updatedAt: '2023-10-11T12:52:16.937Z',
     status: 'NORMAL',
+    // Media articles get a single vector for their first 80 seconds too,
+    // hence no startOffsetSec / endOffsetSec here either.
+    embeddings: [{ vector: EXAMPLE_VECTOR }],
   },
 
   /** Image */
@@ -437,6 +482,25 @@ export default {
         userId: { type: 'keyword' },
         appId: { type: 'keyword' },
         updatedAt: { type: 'date' },
+      },
+    },
+
+    embeddings: {
+      type: 'nested',
+      properties: {
+        vector: {
+          type: 'dense_vector',
+          dims: 768,
+          index: true,
+          similarity: 'cosine',
+          // Pin the index type instead of inheriting ES's default, which
+          // became BBQ (32x binary quantization, at the cost of recall) in
+          // ES 9.1. ~269k articles x 768 dims x 4 bytes is only ~826 MB of
+          // raw vectors, so we can afford to not quantize at all.
+          index_options: { type: 'hnsw' },
+        },
+        startOffsetSec: { type: 'integer' },
+        endOffsetSec: { type: 'integer' },
       },
     },
   },
