@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.0.1';
+export const VERSION = '1.1.0';
 
 export const schema = z
   .object({
@@ -10,7 +10,7 @@ export const schema = z
     docId: z.string(),
 
     /** type of this AI response. */
-    type: z.enum(['AI_REPLY', 'TRANSCRIPT']),
+    type: z.enum(['AI_REPLY', 'TRANSCRIPT', 'EMBEDDING']),
 
     /** The user that requests an AI response */
     userId: z.string(),
@@ -34,6 +34,33 @@ export const schema = z
       .strict()
       .optional(),
 
+    /**
+     * Cached embedding entries for hybrid search. Only populated for
+     * type==='EMBEDDING' records. Stored as opaque JSON (not indexed) — the
+     * read path pulls them out and feeds them into the doc-side `embeddings`
+     * nested field on articles/replies. As on articles/replies there is
+     * exactly one entry per doc today — nothing is split by time, so
+     * `startOffsetSec` / `endOffsetSec` are never written here either.
+     *
+     * Unlike articles.ts / replies.ts, `vector` stays required here, and that
+     * is deliberate: the mapping below is `type: 'object', enabled: false`,
+     * which leaves the field fully intact in `_source` and merely skips
+     * indexing it. Only real `dense_vector` fields are stripped from the
+     * default `_source` by ES 9. So the cache-hit path and `npm run scan`
+     * both still see the vectors here — do not "unify" the three schemas.
+     */
+    embeddings: z
+      .array(
+        z
+          .object({
+            vector: z.array(z.number()).length(768),
+            startOffsetSec: z.number().int().nonnegative().optional(),
+            endOffsetSec: z.number().int().nonnegative().optional(),
+          })
+          .strict()
+      )
+      .optional(),
+
     createdAt: dateSchema,
     updatedAt: dateSchema.optional(),
   })
@@ -43,6 +70,9 @@ export const schema = z
  * A response from AI. Can be AI reply, OCR, speech to text, etc.
  */
 export type AIResponse = z.infer<typeof schema>;
+
+/** See the same constant in articles.ts for why this exists. */
+const EXAMPLE_VECTOR = Array.from({ length: 768 }, () => 0.1);
 
 export const examples: AIResponse[] = [
   // AI response example
@@ -77,6 +107,17 @@ export const examples: AIResponse[] = [
     text: '鬧大了。俄羅斯在聯合國公開宣稱武力介入日本核污染問題。',
     updatedAt: '2023-09-02T16:27:41.883Z',
   },
+  // Embedding cache example
+  {
+    userId: 'some-user-id',
+    appId: 'line-bot',
+    status: 'SUCCESS',
+    createdAt: '2024-01-27T22:06:01.412Z',
+    type: 'EMBEDDING',
+    docId: '28d15z6t2y499',
+    embeddings: [{ vector: EXAMPLE_VECTOR }],
+    updatedAt: '2024-01-27T22:06:01.412Z',
+  },
 ];
 
 export default {
@@ -102,6 +143,14 @@ export default {
         completionTokens: { type: 'long' },
         totalTokens: { type: 'long' },
       },
+    },
+
+    // Opaque storage for embedding cache. `enabled: false` keeps the giant
+    // float arrays out of the inverted index — they're only ever fetched as
+    // _source by createEmbedding's cache-hit path.
+    embeddings: {
+      type: 'object',
+      enabled: false,
     },
 
     createdAt: { type: 'date' },

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dateSchema } from '../util/sharedSchema';
 
-export const VERSION = '1.1.1';
+export const VERSION = '1.2.0';
 
 export const schema = z
   .object({
@@ -32,10 +32,37 @@ export const schema = z
           .strict()
       )
       .optional(),
+
+    /**
+     * Dense-vector embeddings for hybrid search. Replies are text-only, so
+     * there is always exactly one entry and `startOffsetSec` /
+     * `endOffsetSec` are never written. Read path scores via nested KNN
+     * retriever.
+     *
+     * `vector` is optional for the same reason as in articles.ts: ES 9
+     * excludes `dense_vector` from the default `_source`
+     * (`index.mapping.exclude_source_vectors`), so a plain GET returns
+     * `[{}]` and a required `vector` would break `npm run scan`. Reindex /
+     * recovery still rehydrate it from doc values.
+     */
+    embeddings: z
+      .array(
+        z
+          .object({
+            vector: z.array(z.number()).length(768).optional(),
+            startOffsetSec: z.number().int().nonnegative().optional(),
+            endOffsetSec: z.number().int().nonnegative().optional(),
+          })
+          .strict()
+      )
+      .optional(),
   })
   .strict();
 
 export type Reply = z.infer<typeof schema>;
+
+/** See the same constant in articles.ts for why this exists. */
+const EXAMPLE_VECTOR = Array.from({ length: 768 }, () => 0.1);
 
 export const examples: Reply[] = [
   {
@@ -55,6 +82,7 @@ export const examples: Reply[] = [
         url: 'https://cons.judicial.gov.tw/docdata.aspx?fid=100&id=310766',
       },
     ],
+    embeddings: [{ vector: EXAMPLE_VECTOR }],
   },
 ];
 
@@ -74,6 +102,24 @@ export default {
         normalizedUrl: { type: 'keyword' },
         title: { type: 'text', analyzer: 'cjk' },
         summary: { type: 'text', analyzer: 'cjk_url_email' },
+      },
+    },
+
+    embeddings: {
+      type: 'nested',
+      properties: {
+        vector: {
+          type: 'dense_vector',
+          dims: 768,
+          index: true,
+          similarity: 'cosine',
+          // Same as articles.ts: pin the index type so we don't silently
+          // inherit ES 9.1+'s BBQ default. Replies are an even smaller index
+          // than articles, so there is nothing to gain from quantization.
+          index_options: { type: 'hnsw' },
+        },
+        startOffsetSec: { type: 'integer' },
+        endOffsetSec: { type: 'integer' },
       },
     },
   },
