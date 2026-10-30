@@ -43,6 +43,14 @@ For example, the mappings in `schema/articles.js` would go to the index `article
 alias from `articles` to `articles_v1_0_0` would be created after running `npm run schema`, given
 that the `VERSION` in `schema/article.js` is `1.0.0`.
 
+Whenever you change a mapping, bump its `VERSION` too, so that a new index is created to reindex
+into. CI checks this on pull requests; to run the same check locally against `master`:
+
+```
+$ mkdir -p .base && git archive origin/master schema util | tar -x -C .base
+$ npm run check-version-bump -- .base/schema
+```
+
 ### Running migrations
 
 All index mappings are already the latest, so if you are starting a database with fresh data,
