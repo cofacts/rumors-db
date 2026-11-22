@@ -21,6 +21,17 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      # `npm run schema` creates <index>_v<VERSION>, so a mapping change needs a
+      # VERSION bump to get a new index. Compare against the PR's base branch.
+      - name: Check VERSION is bumped when a mapping changes
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --depth=1 origin "$BASE_REF"
+          mkdir -p .base
+          git archive FETCH_HEAD schema util | tar -x -C .base
+          npm run check-version-bump -- .base/schema
+        env:
+          BASE_REF: ${{ github.base_ref }}
 
   test:
     runs-on: ubuntu-latest
